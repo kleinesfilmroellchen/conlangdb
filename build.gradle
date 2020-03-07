@@ -1,0 +1,45 @@
+plugins {
+    id 'org.javamodularity.moduleplugin' version '1.6.0' apply false
+}
+
+apply plugin: "java"
+apply plugin: "org.javamodularity.moduleplugin"
+apply plugin: 'application'
+
+repositories {
+	jcenter()
+	mavenCentral()
+}
+
+version = '0.1.0'
+sourceCompatibility = 13
+
+sourceSets {
+	 main {
+		java {
+			srcDir 'src/main'
+		}
+		resources {
+			srcDir 'src/main/resources'
+		}
+		output.resourcesDir = file('out/public')
+		java.outputDir = file('out/bin')
+	}
+	
+	test {
+		java {
+			srcDir 'src/test'
+		}
+		resources {
+			srcDir 'src/test/resources'
+		}
+	}
+}
+
+mainClassName = "$moduleName/klfr.conlangdb.ServerMain"
+
+task hello {
+	doLast {
+		println "Hello, world!"
+	}
+}
