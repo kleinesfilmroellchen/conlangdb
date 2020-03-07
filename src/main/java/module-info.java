@@ -7,4 +7,5 @@ module klfr.conlangdb {
 	requires java.base;
 	requires java.sql;
 	requires java.net.http;
+	requires jdk.httpserver;
 }

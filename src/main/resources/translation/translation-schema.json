@@ -1,0 +1,11 @@
+{
+	"$schema": "http://json-schema.org/schema",
+	"type": "object",
+	"description": "Translation files for all HTML text content. Any HTML text to be translated is identified by the the special translation class of the element, starting with \"t--\"It is recommended to only translate the content of <span> elements. All elements that already have content stay this way, whether a translation exists or not. Translation always fallbacks to the English file (en.json).",
+	"contentEncoding": "utf-8",
+	"properties": { "$schema": {"type":"string"}},
+	"patternProperties": {
+		"t\\-\\-.+": { "type": "string" }
+	},
+	"additionalProperties": false
+}
