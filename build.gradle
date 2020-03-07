@@ -4,14 +4,20 @@ plugins {
 
 apply plugin: "java"
 apply plugin: "org.javamodularity.moduleplugin"
-apply plugin: 'application'
+apply plugin: "application"
 
 repositories {
 	jcenter()
 	mavenCentral()
 }
 
+dependencies {
+	// https://mvnrepository.com/artifact/com.sun.net.httpserver/http
+	implementation 'com.sun.net.httpserver:http:20070405'
+}
+
 version = '0.1.0'
+
 sourceCompatibility = 13
 
 sourceSets {
@@ -22,7 +28,7 @@ sourceSets {
 		resources {
 			srcDir 'src/main/resources'
 		}
-		output.resourcesDir = file('out/public')
+		output.resourcesDir = file('out/res')
 		java.outputDir = file('out/bin')
 	}
 	
@@ -36,10 +42,11 @@ sourceSets {
 	}
 }
 
-mainClassName = "$moduleName/klfr.conlangdb.ServerMain"
-
-task hello {
-	doLast {
-		println "Hello, world!"
-	}
+def classname = "$moduleName/klfr.conlangdb.ServerEntry"
+application {
+	mainClassName = classname
+}
+task runDirect(type: Exec) {
+	dependsOn build
+	commandLine "java", "-cp", file("out/bin"), "-p", file("out/bin"), "--module", "klfr.conlangdb/klfr.conlangdb.ServerEntry"
 }
