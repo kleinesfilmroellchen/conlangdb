@@ -30,6 +30,10 @@ This starts the server in the same process, so killing it also kills the server.
 
 The .classpath and .project files are only there to allow VSCode, Eclipse and other IDEs to work with the project normally. They do not provide correct build information.
 
+### PostgreSQL setup
+
+All of this will later be handled by the gradle build process, but for now, you have to manually create a database `ConlangDB` on your PostgreSQL server with a user `conlang` and password `planlingvo` ("constructed language" in [Esperanto](https://en.wikipedia.org/wiki/Esperanto)) that has full access to (at least) this database. Also, make sure that the PostgreSQL server (postmaster service) is running on the same system as the Java server and uses the default PostgreSQL port.
+
 ### Arguments
 
 (some of these not implemented yet)
