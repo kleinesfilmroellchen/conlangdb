@@ -34,6 +34,15 @@ The .classpath and .project files are only there to allow VSCode, Eclipse and ot
 
 All of this will later be handled by the gradle build process, but for now, you have to manually create a database `ConlangDB` on your PostgreSQL server with a user `conlang` and password `planlingvo` ("constructed language" in [Esperanto](https://en.wikipedia.org/wiki/Esperanto)) that has full access to (at least) this database. Also, make sure that the PostgreSQL server (postmaster service) is running on the same system as the Java server and uses the default PostgreSQL port.
 
+Here is the basic SQL code for setting that up, assuming an account with CREATEROLE and CREATEDB permissions:
+
+```sql
+create user conlang encrypted password 'planlingvo';
+alter role conlang noinherit;
+create database ConlangDB;
+grant all privileges on database conlangdb to conlang;
+```
+
 ### Arguments
 
 (some of these not implemented yet)
