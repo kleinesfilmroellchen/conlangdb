@@ -39,7 +39,11 @@ Here is the basic SQL code for setting that up, assuming an account with CREATER
 ```sql
 create user conlang encrypted password 'planlingvo';
 alter role conlang noinherit;
-create database ConlangDB;
+create database conlangdb
+      with owner conlang   
+           encoding 'UTF8'
+           template template0
+           lc_collate 'C' lc_ctype 'C';
 grant all privileges on database conlangdb to conlang;
 ```
 
