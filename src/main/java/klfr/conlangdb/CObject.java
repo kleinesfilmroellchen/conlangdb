@@ -1,6 +1,7 @@
 package klfr.conlangdb;
 
 import java.io.Serializable;
+import java.util.logging.Logger;
 
 /**
  * Custom ConlangDB Object class that provides custom default object functionality.
@@ -8,6 +9,11 @@ import java.io.Serializable;
  */
 public abstract class CObject extends Object implements Cloneable, Serializable {
 	public static final long serialVersionUID = 1l;
+	protected static final Logger log = Logger.getLogger("klfr.conlangdb");
+
+	protected CObject() {
+		log.fine(f("CONSTRUCT %s", this.getClass().getCanonicalName()));
+	}
 	
 	/**
 	 * Cloning method.

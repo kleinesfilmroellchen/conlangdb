@@ -12,8 +12,9 @@ repositories {
 }
 
 dependencies {
-	// https://mvnrepository.com/artifact/com.sun.net.httpserver/http
-	implementation 'com.sun.net.httpserver:http:20070405'
+	implementation group: 'org.takes', name: 'takes', version: '1.11.3'
+	compileClasspath group: 'org.takes', name: 'takes', version: '1.11.3'
+	implementation 'org.postgresql:postgresql:42.2.10'
 }
 
 version = '0.1.0'
@@ -46,7 +47,17 @@ def classname = "$moduleName/klfr.conlangdb.ServerEntry"
 application {
 	mainClassName = classname
 }
+
+// task copyDependencies(type: Copy) {
+// 	//referring to the 'compileClasspath' configuration
+// 	from configurations.compileClasspath
+// 	into 'out/lib'
+// }
+// build.dependsOn copyDependencies
+
+run.dependsOn build
+
 task runDirect(type: Exec) {
 	dependsOn build
-	commandLine "java", "-cp", file("out/bin"), "-p", file("out/bin"), "--module", "klfr.conlangdb/klfr.conlangdb.ServerEntry"
+	commandLine "java", "-cp", file("out"), "-p", file("out/bin"), "--module", "klfr.conlangdb/klfr.conlangdb.ServerEntry"
 }
