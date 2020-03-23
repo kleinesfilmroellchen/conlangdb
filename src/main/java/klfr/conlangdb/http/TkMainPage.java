@@ -11,9 +11,9 @@ import org.takes.rs.*;
  */
 public class TkMainPage implements Take {
 	private static final Logger log = Logger.getLogger(TkMainPage.class.getCanonicalName());
+
 	@Override
 	public Response act(Request req) {
-		log.fine("GET on main page");
-		return new RsCWrap(new RsHtml("hey there, my friend!"));
+		return new RsHtml("<div>This is the main page!!</div>");
 	}
 }

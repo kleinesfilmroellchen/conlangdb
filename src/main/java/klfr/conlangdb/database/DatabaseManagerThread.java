@@ -1,12 +1,15 @@
-package klfr.conlangdb;
+package klfr.conlangdb.database;
+
+import static klfr.conlangdb.CObject.f;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
@@ -14,13 +17,11 @@ import java.util.logging.Logger;
 
 import klfr.conlangdb.ServerMain.Arguments;
 
-import static klfr.conlangdb.CObject.*;
-
 /**
  * Thread that will communicate with the database and recieve commands from the
  * database handler.
  */
-public class DatabaseManagerThread extends Thread {
+class DatabaseManagerThread extends Thread {
 
 	private static final Logger log = Logger.getLogger(DatabaseManagerThread.class.getCanonicalName());
 	/**

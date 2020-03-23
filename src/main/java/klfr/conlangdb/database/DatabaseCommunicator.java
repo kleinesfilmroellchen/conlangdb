@@ -1,14 +1,15 @@
-package klfr.conlangdb;
+package klfr.conlangdb.database;
 
-import java.sql.*;
-import java.util.Queue;
-import java.util.concurrent.*;
+import java.sql.Connection;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import klfr.conlangdb.CObject;
 import klfr.conlangdb.ServerMain.Arguments;
 
 /**
@@ -49,7 +50,8 @@ public class DatabaseCommunicator extends CObject {
 		try {
 			cond.await();
 			con = dbmanagerT.getConnection();
-		} catch (InterruptedException e) { } finally {
+		} catch (InterruptedException e) {
+		} finally {
 			signal.unlock();
 		}
 		log.info("Database connection up");

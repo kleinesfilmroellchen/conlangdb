@@ -1,9 +1,13 @@
 package klfr.conlangdb;
 
 import klfr.conlangdb.http.*;
+import static klfr.conlangdb.http.TkStaticPageWrap.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.net.InetSocketAddress;
 import java.net.http.*;
 import java.util.Collection;
@@ -11,6 +15,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.takes.http.Exit;
 import org.takes.http.FtBasic;
@@ -23,7 +28,7 @@ import org.takes.*;
 /**
  * Main class of the server.
  */
-class ServerMain extends CObject {
+public class ServerMain extends CObject {
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger log = Logger.getLogger(ServerMain.class.getCanonicalName());
@@ -69,26 +74,35 @@ class ServerMain extends CObject {
 	 */
 	public void start() {
 		try {
-			log.info("Server Main Thread up.");
+			log.info("Server Main method entered");
 			log.config(() -> arguments.toString());
-			new FtBasic(new TkFallback(new TkFork(
+
+			// Setup the different handlers for all requests the server can handle
+			new FtBasic(new TkLog(new TkFallback(new TkFork(
 					// Static JavaScript
 					new FkRegex("/js/.+", new TkWithType(new TkFiles(new File("./out/res/static")), "text/javascript")),
 					// Static CSS
 					new FkRegex("/css/.+", new TkWithType(new TkFiles(new File("./out/res/static")), "text/css")),
 					// Static images
 					new FkRegex("/img/.+", new TkFiles("./out/res/static")),
+					// Favicon
+					new FkRegex(Pattern.quote("/favicon.ico"),
+							new TkWithType(new TkFiles(new File("./out/res/static/img")), "image/png")),
 					// Main page
-					new FkRegex("/", new TkMainPage())),
+					new FkRegex("/", new TkStaticPageWrap(new TkMainPage(), "mainpage")),
+					// Translation JSON maps
+					new FkRegex("/translation/([a-z]{3})_([A-Z]{3})", new TkTranslations())
+					),
 					// Fallback for handling server errors and error codes
-					new FbChain(new FbFail(HttpStatusCode.NOT_FOUND),
-							new FbFail(HttpStatusCode.METHOD_UNALLOWED), new Fallback() {
+					new FbChain(new FbFail(HttpStatusCode.NOT_FOUND), new FbFail(HttpStatusCode.METHOD_UNALLOWED),
+							new Fallback() {
 								public org.takes.misc.Opt<Response> route(final RqFallback req) {
 									log.severe("Server exception " + req);
 									return new org.takes.misc.Opt.Single<Response>(
 											new RsHtml("oops, something went terribly wrong!"));
 								}
-							})),
+							}))),
+					// Start server on given port and run it forever
 					arguments.port).start(Exit.NEVER);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

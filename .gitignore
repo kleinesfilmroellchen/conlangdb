@@ -6,3 +6,7 @@ build
 
 # Ignore own build directory
 out
+
+# Ignore IDE files
+.classpath
+.project

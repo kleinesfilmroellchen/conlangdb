@@ -10,7 +10,7 @@ const translation = getPageTranslation();
 async function getPageTranslation() {
 	const language = new URLSearchParams(window.location.search).get("lang") || navigator.language;
 	// The server adds all the English texts where the actual translation file has no text translated.
-	return fetch(`/translation/${language}`).then(result => result.json()).then();
+	return {}; // fetch(`/translation/${language}`).then(result => result.json());
 }
 
 function bodyLoaded() {
@@ -18,7 +18,7 @@ function bodyLoaded() {
 	translation.then(translations => {
 		const generalName = translations['t--conlangdb'];
 		title.innerHTML = generalName + " — " + translations[`t--title-${SETTINGS.pagename}`]
-		return await translations;
+		return translations;
 	});
 	console.log(translation);
 	translation.then(translations => {
@@ -31,5 +31,6 @@ function bodyLoaded() {
 					node.innerHTML = translationValue;
 			})
 		}
+		return translations;
 	});
 }

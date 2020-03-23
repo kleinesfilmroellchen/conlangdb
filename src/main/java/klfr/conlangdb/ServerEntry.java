@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import klfr.conlangdb.ServerMain.Arguments;
+import klfr.conlangdb.database.DatabaseCommunicator;
 
 /**
  * Entry method of the server. Responsible for parsing command line arguments
@@ -52,7 +53,8 @@ public class ServerEntry extends CObject {
 				var time = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)
 						.format(record.getInstant().atZone(ZoneId.systemDefault()));
 				var level = record.getLevel().getLocalizedName();
-				var logName = record.getLoggerName();//"%s.%s".formatted(record.getSourceClassName(), record.getSourceMethodName());
+				var logName = record.getLoggerName();// "%s.%s".formatted(record.getSourceClassName(),
+														// record.getSourceMethodName());
 				return "[%s %-40s |%6s] %s%n".formatted(time, logName, level, msg);
 			}
 		});

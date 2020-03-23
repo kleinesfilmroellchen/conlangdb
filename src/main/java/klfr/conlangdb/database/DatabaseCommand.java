@@ -1,10 +1,9 @@
-package klfr.conlangdb;
+package klfr.conlangdb.database;
 
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.function.Function;
 import java.util.logging.Logger;

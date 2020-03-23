@@ -1,0 +1,18 @@
+{
+	"$schema": "./translation-schema.json",
+	"t--zero": "zero",
+	"t--one": "one",
+	"t--two": "two",
+	"t--three": "three",
+	"t--four": "four",
+	"t--five": "five",
+	"t--six": "six",
+	"t--seven": "seven",
+	"t--eight": "eight",
+	"t--nine": "nine",
+	"t--ten": "ten",
+	"t--conlangdb": "ConlangDB",
+	"t--title-mainpage": "Main page",
+	"t--home": "Home",
+	"t--languages": "Languages"
+}
