@@ -17,6 +17,8 @@ import java.util.concurrent.*;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.takes.http.BkBasic;
+import org.takes.http.BkParallel;
 import org.takes.http.Exit;
 import org.takes.http.FtBasic;
 import org.takes.facets.fork.*;
@@ -77,8 +79,9 @@ public class ServerMain extends CObject {
 			log.info("Server Main method entered");
 			log.config(() -> arguments.toString());
 
-			// Setup the different handlers for all requests the server can handle
-			new FtBasic(new TkLog(new TkFallback(new TkFork(
+			//// Setup the Takes server architecture
+			// Basic frontent using parallel threads, logging and error handling
+			new FtBasic(new BkParallel(new BkBasic(new TkLog(new TkFallback(new TkFork(
 					// Static JavaScript
 					new FkRegex("/js/.+", new TkWithType(new TkFiles(new File("./out/res/static")), "text/javascript")),
 					// Static CSS
@@ -91,7 +94,7 @@ public class ServerMain extends CObject {
 					// Main page
 					new FkRegex("/", new TkStaticPageWrap(new TkMainPage(), "mainpage")),
 					// Translation JSON maps
-					new FkRegex("/translation/([a-z]{3})_([A-Z]{3})", new TkTranslations())
+					new FkRegex("\\/translation\\/([a-z]{2,3})(?:\\_([A-Z]{2,3}))?", new TkTranslations())
 					),
 					// Fallback for handling server errors and error codes
 					new FbChain(new FbFail(HttpStatusCode.NOT_FOUND), new FbFail(HttpStatusCode.METHOD_UNALLOWED),
@@ -101,7 +104,7 @@ public class ServerMain extends CObject {
 									return new org.takes.misc.Opt.Single<Response>(
 											new RsHtml("oops, something went terribly wrong!"));
 								}
-							}))),
+							})))), 10),
 					// Start server on given port and run it forever
 					arguments.port).start(Exit.NEVER);
 		} catch (Exception e) {

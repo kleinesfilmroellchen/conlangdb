@@ -52,7 +52,7 @@ public class ServerEntry extends CObject {
 				}
 				var time = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)
 						.format(record.getInstant().atZone(ZoneId.systemDefault()));
-				var level = record.getLevel().getLocalizedName();
+				var level = record.getLevel().getLocalizedName().substring(0, Math.min(record.getLevel().getLocalizedName().length(), 6));
 				var logName = record.getLoggerName();// "%s.%s".formatted(record.getSourceClassName(),
 														// record.getSourceMethodName());
 				return "[%s %-40s |%6s] %s%n".formatted(time, logName, level, msg);

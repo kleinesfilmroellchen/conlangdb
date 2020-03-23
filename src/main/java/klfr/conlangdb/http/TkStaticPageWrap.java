@@ -52,11 +52,11 @@ public class TkStaticPageWrap extends CObject implements Take {
 			var w = new StringWriter();
 			new InputStreamReader(sequencify(streamify("<!DOCTYPE html>\n<html>                     "),
 					CResources.openBinary("html/head.html").get(),
-					streamify("<script>SETTINGS.pagename = \"" + pagename + "\";</script></head><body>"),
+					streamify("<script>SETTINGS.pagename = \"" + pagename + "\";</script></head><body onload=\"bodyLoaded()\">"),
 					CResources.openBinary("html/header.html").get(), prepared.body(), streamify("</body></html>")))
 							.transferTo(w);
 			var body = w.toString();
-			log.fine(body);
+			log.finer(body);
 			return new RsWithHeader(new RsWithType(new RsCWrap(new Response() {
 				// COMBAK: set content-length header by pre-generating the body on act() call
 				public Iterable<String> head() throws IOException {

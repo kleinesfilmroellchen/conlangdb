@@ -26,6 +26,7 @@ public final class CResources extends CObject {
 	 * @return
 	 */
 	public static Optional<InputStream> openBinary(String rname) {
+		log.fine(f("RESOURCE %s open binary", rname));
 		try {
 			return Optional.ofNullable(MODULE_LOADER.getResourceAsStream(RESOURCE_PATH + "/" + rname));
 		} catch (IOException | NullPointerException e) {
@@ -41,6 +42,7 @@ public final class CResources extends CObject {
 	 * @return A reader accessing the resource with UTF-8 encoding.
 	 */
 	public static Optional<Reader> open(String rname) {
+		log.fine(f("RESOURCE %s open", rname));
 		try {
 			return Optional.ofNullable(new InputStreamReader(
 					MODULE_LOADER.getResourceAsStream(RESOURCE_PATH + "/" + rname), Charset.forName("utf-8")));
@@ -50,7 +52,7 @@ public final class CResources extends CObject {
 	}
 
 	public static Optional<JSONObject> openJSON(String rname) {
-		var r = open("translation/en.json");
+		var r = open(rname);
 		return ifelse(() -> {
 			var json = new StringWriter();
 			var reader = r.get();

@@ -14,6 +14,6 @@ public class TkMainPage implements Take {
 
 	@Override
 	public Response act(Request req) {
-		return new RsHtml("<div>This is the main page!!</div>");
+		return new RsHtml("<div></div>");
 	}
 }

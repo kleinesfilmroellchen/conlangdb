@@ -1,6 +1,9 @@
 package klfr.conlangdb;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.json.*;
 
@@ -9,26 +12,80 @@ import org.json.*;
  * methods. Returned objects can immediately be serialized and sent to the
  * client.
  */
-class TranslationProvider extends CObject {
+public class TranslationProvider extends CObject {
 	private static final long serialVersionUID = 1L;
+	private static final Logger log = Logger.getLogger(TranslationProvider.class.getCanonicalName());
 
 	/**
-	 * Default translations which are loaded only once on startup for efficiency.
+	 * Default translation dictionary which are loaded only once on startup for
+	 * efficiency. Using the standard method will also place it into the cache.
 	 */
-	private static final Map<String, String> defaultTranslations = getTranslation("en");
+	private static Map<String, String> defaultTranslations = jsonToMap(
+			CResources.openJSON("translation/en.json").get());
 
-	// TODO: implement storage of locale translations
+	/**
+	 * Translation cache that stores a translation dictionary for a given locale
+	 * once created.
+	 */
+	private static final Map<TranslationLocale, JSONObject> translations = new ConcurrentHashMap<TranslationLocale, JSONObject>(
+			10, 0.9f);
+
+	/**
+	 * Simple hashable immutable class that holds information about a language and
+	 * possibly a region.
+	 */
+	private static class TranslationLocale extends CObject {
+		private static final long serialVersionUID = 1L;
+		private final String language;
+		private final Optional<String> region;
+
+		public TranslationLocale(String language, Optional<String> region) {
+			this.language = language.toLowerCase();
+			this.region = region;
+		}
+
+		public TranslationLocale(String language) {
+			this(language, Optional.empty());
+		}
+
+		public TranslationLocale(String language, String region) {
+			this(language, Optional.ofNullable(region));
+		}
+
+		public String toString() {
+			return "TransLocale:" + this.language
+					+ (this.region.isPresent() ? ("_" + this.region.get().toUpperCase()) : "");
+		}
+
+		public boolean equals(Object other) {
+			if (other instanceof TranslationLocale) {
+				var otherTL = (TranslationLocale) other;
+				return otherTL.language.equals(this.language) && otherTL.region.equals(this.region);
+			}
+			return false;
+		}
+
+		@Override
+		public int hashCode() {
+			return this.region.hashCode() ^ this.language.hashCode() ^ 0xdeafb00d;
+		}
+
+		@Override
+		public CObject clone() {
+			return new TranslationLocale(language, region);
+		}
+	}
 
 	@Override
 	public CObject clone() {
 		return new TranslationProvider();
 	}
 
-	public static Map<String, String> getTranslation(String language) {
+	public static JSONObject getTranslation(String language) {
 		return getTranslation(language, Optional.empty());
 	}
 
-	public static Map<String, String> getTranslation(String language, String region) {
+	public static JSONObject getTranslation(String language, String region) {
 		return getTranslation(language, Optional.ofNullable(region));
 	}
 
@@ -62,19 +119,46 @@ class TranslationProvider extends CObject {
 	 *         specified language and region, and, if necessary, includes fallback
 	 *         keys from language and default translations.
 	 */
-	public static Map<String, String> getTranslation(String language, Optional<String> region) {
-		Map<String, String> translationDict = new HashMap<>(50);
-		if (region.isPresent()) {
-			var maybetranslationDict = CResources.openJSON(f("translation/%s_%s.json",
-					language.replace(".", "").toLowerCase(), region.get().replace(".", "").toLowerCase()));
-			if (maybetranslationDict.isPresent())
-				translationDict = jsonToMap(maybetranslationDict.get());
+	public static JSONObject getTranslation(String language, Optional<String> region) {
+		var tl = new TranslationLocale(language, region);
+		//// Search for a translation in the map
+		if (translations.containsKey(tl)) {
+			log.fine(f("Translation found for %s", tl));
+			return translations.get(tl);
 		}
+
+		//// Otherwise, generate the translation for the locale
+		log.info(f("Generating translation for %s...", tl));
+		Map<String, String> translationDict = new HashMap<>(100);
+		// Java maps provide a putAll() function that puts all of the key-value mappings
+		// of the parameter map into the map being modified. As this overrides any
+		// existing mappings that are present, we need to add the translations in
+		// reverse order: first, all default translations, then language translations,
+		// then region-language translations.
+		//// Defaults:
+		translationDict.putAll(defaultTranslations);
+
+		//// Language:
 		var maybeLangDict = CResources.openJSON("translation/" + language.replace(".", "").toLowerCase() + ".json");
 		if (maybeLangDict.isPresent()) {
-			// fallback for every language key
-			var langDict = jsonToMap(maybeLangDict.get());
+			// add all language keys: this should override almost every key present
+			translationDict.putAll(jsonToMap(maybeLangDict.get()));
 		}
+
+		//// Region:
+		if (region.isPresent()) {
+			var maybetranslationDict = CResources.openJSON(f("translation/%s_%s.json",
+					language.replace(".", "").toLowerCase(), region.get().replace(".", "").toUpperCase()));
+			if (maybetranslationDict.isPresent())
+				translationDict.putAll(jsonToMap(maybetranslationDict.get()));
+		}
+		// remove schema from dictionary. This removes information that the user doesn't
+		// need and prevents an "invalid selector" error on the JS translation frontend.
+		translationDict.remove("$schema");
+		//// Store the newly created translation for later reuse and return it
+		var translationDictJson = mapToJSON(translationDict);
+		translations.put(tl, translationDictJson);
+		return translationDictJson;
 	}
 
 	/**
@@ -90,5 +174,19 @@ class TranslationProvider extends CObject {
 		for (var key : keys)
 			map.put(key, obj.get(key).toString());
 		return map;
+	}
+
+	/**
+	 * Creates a JSONObject from the standard Java map by adding each key-value
+	 * pair.
+	 * 
+	 * @param map The map to convert.
+	 * @return a new JSONObject with only strings as values.
+	 */
+	public static JSONObject mapToJSON(final Map<String, String> map) {
+		final var obj = new JSONObject();
+		for (var kv : map.entrySet())
+			obj.put(kv.getKey(), kv.getValue());
+		return obj;
 	}
 }

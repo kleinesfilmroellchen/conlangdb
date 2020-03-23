@@ -21,11 +21,13 @@ public class FbFail extends CObject implements Fallback {
 	}
 
 	public Opt<Response> route(RqFallback req) {
-		log.warning("%s Request exited with code %s".formatted(req, code));
 		if (code.code != req.code())
 			return new Opt.Empty<Response>();
-		else
-			return new Opt.Single<Response>(new RsWithStatus(new RsText(code.standardMessage), code.code, code.standardMessage));
+		else {
+			log.warning("%s Request exited with code %s".formatted(req, code));
+			return new Opt.Single<Response>(
+					new RsWithStatus(new RsText(code.standardMessage), code.code, code.standardMessage));
+		}
 	}
 
 	public CObject clone() {

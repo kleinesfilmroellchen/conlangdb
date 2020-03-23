@@ -29,10 +29,12 @@ public class RsCWrap extends CObject implements Response {
 	 * Uses given response code and the default reason message. Useful for errors.
 	 */
 	public RsCWrap(Response res, HttpStatusCode status) {
-		// BUG: The content-length header set previously by decorators causes most browsers to quit reading from the connection,
-		// which leads to malformed websites being transmitted. It is best to manually delete the header first.
-		this.res = new RsWithoutHeader(new RsWithStatus(new RsWithHeader(res, "Server", "ConlangDB/0.1"), status.code,
-				status.standardMessage), "Content-Length");
+		// BUG: The content-length header set previously by decorators causes most
+		// browsers to quit reading from the connection, which leads to malformed
+		// websites being transmitted. It is best to manually delete the header first.
+		this.res = new RsWithHeader(new RsWithoutHeader(
+				new RsWithStatus(new RsWithHeader(res, "Server", "ConlangDB/0.1"), status.code, status.standardMessage),
+				"Content-Length"), "Connection", "close");
 	}
 
 	public InputStream body() throws IOException {

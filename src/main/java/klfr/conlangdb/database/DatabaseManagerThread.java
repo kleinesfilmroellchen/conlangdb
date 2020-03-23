@@ -103,7 +103,7 @@ class DatabaseManagerThread extends Thread {
 							log.log(Level.SEVERE, "Command execution caused exception.", e);
 						}
 					else {
-						// restart the command - is this a good idea?
+						// TODO: restart the command - is this a good idea?
 						commandQueue.add(nextCommand.clone(databaseConnection));
 					}
 				}
