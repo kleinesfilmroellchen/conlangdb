@@ -15,6 +15,8 @@ dependencies {
 	implementation group: 'org.takes', name: 'takes', version: '1.11.3'
 	compileClasspath group: 'org.takes', name: 'takes', version: '1.11.3'
 	implementation 'org.postgresql:postgresql:42.2.10'
+	compileClasspath 'org.json:json:20190722'
+	implementation 'org.json:json:20190722'
 }
 
 version = '0.1.0'
@@ -30,7 +32,7 @@ sourceSets {
 			srcDir 'src/main/resources'
 		}
 		output.resourcesDir = file('out/res')
-		java.outputDir = file('out/bin')
+		java.outputDir = file('out')
 	}
 	
 	test {
@@ -59,5 +61,5 @@ run.dependsOn build
 
 task runDirect(type: Exec) {
 	dependsOn build
-	commandLine "java", "-cp", file("out"), "-p", file("out/bin"), "--module", "klfr.conlangdb/klfr.conlangdb.ServerEntry"
+	commandLine "java", "-cp", file("out"), "-p", file("out"), "--module", "klfr.conlangdb/klfr.conlangdb.ServerEntry"
 }

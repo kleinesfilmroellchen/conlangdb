@@ -6,7 +6,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" output="build/idetmp/compileJava/resources" path="src/main/resources">
+	<classpathentry kind="src" output="build/idetmp/mainres" path="src/main/resources">
 		<attributes>
 			<attribute name="gradle_scope" value="main"/>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
@@ -14,19 +14,33 @@
 	</classpathentry>
 	<classpathentry kind="src" output="build/idetmp/compileTestJava" path="src/test/java">
 		<attributes>
+			<attribute name="test" value="true"/>
 			<attribute name="gradle_scope" value="test"/>
 			<attribute name="gradle_used_by_scope" value="test"/>
-			<attribute name="test" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" output="build/idetmp/compileTestJava/resources" path="src/test/resources">
+	<classpathentry kind="src" output="build/idetmp/testres" path="src/test/resources">
 		<attributes>
+			<attribute name="test" value="true"/>
 			<attribute name="gradle_scope" value="test"/>
 			<attribute name="gradle_used_by_scope" value="test"/>
-			<attribute name="test" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-13/"/>
+	<classpathentry kind="lib" path="C:/_MANUEL/Dokumente/Programmieren/java-libs/json-20190722.jar">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/_MANUEL/Dokumente/Programmieren/java-libs/takes-1.19.jar">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-13/">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
 	<classpathentry kind="output" path="bin/default"/>
 </classpath>
