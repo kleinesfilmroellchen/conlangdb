@@ -74,7 +74,7 @@ class DatabaseManagerThread extends Thread {
 		props.setProperty("password", args.databasePassword);
 		// props.setProperty("ssl", "true");
 		// use postgresql database on localhost with given database
-		final String url = new URI("jdbc:postgresql://localhost/" + args.databaseName).toASCIIString();
+		final String url = new URI("jdbc:postgresql://localhost:5431/" + args.databaseName).toASCIIString();
 		return DriverManager.getConnection(url, props);
 	}
 
