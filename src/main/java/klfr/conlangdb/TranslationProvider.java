@@ -122,10 +122,11 @@ public class TranslationProvider extends CObject {
 	public static JSONObject getTranslation(String language, Optional<String> region) {
 		var tl = new TranslationLocale(language, region);
 		//// Search for a translation in the map
-		if (translations.containsKey(tl)) {
-			log.fine(f("Translation found for %s", tl));
-			return translations.get(tl);
-		}
+		// TODO: re-enable for non-debugging runs
+		// if (translations.containsKey(tl)) {
+		// 	log.fine(f("Translation found for %s", tl));
+		// 	return translations.get(tl);
+		// }
 
 		//// Otherwise, generate the translation for the locale
 		log.info(f("Generating translation for %s...", tl));

@@ -11,6 +11,20 @@
 	"t--eight": "Acht",
 	"t--nine": "Neun",
 	"t--ten": "Zehn",
+
 	"t--conlangdb": "ConlangDB",
-	"t--title-mainpage": "Startseite"
+	"t--home": "Start",
+	"t--languages": "Sprachen",
+	"t--dictionary": "Wörter",
+	"t--attributes": "Worteigenschaften",
+	"t--no-lang-selected": "Keine Sprachen ausgewählt",
+	"t--help": "Hilfe",
+	"t--version": "Version",
+	"t--license-info": "Dieses Projekt ist unter AGPL 2.0 lizensiert.",
+
+	"t--welcomemsg": "Willkommen bei ConlangDB. Bitte beachte die Seitenleiste für Informationen zur Benutzung der Webanwendung. Zu Beginn kannst du eine Sprache auswählen, indem du das &bdquo;Sprachen&ldquo;-Menü öffnest.",
+	"t--conlangs": "Konstruierte Sprachen",
+
+	"t--title-mainpage": "Startseite",
+	"t--helptext-mainpage": "Das ist die Startseite, hier findest du Statistiken über deine Datenbank. Benutze die Navigationsleiste oben, um verschiedene Unterseiten und Menüs zu öffnen. Klicke einfach auf irgendeine, um sie auszuprobieren.<br>Diese Hilfebox gibt es für jede Unterseite. Sie stellt hilfreiche Informationen für die momentane Seite zur Verfügung. Du kannst auf den &bdquo;Hilfe&ldquo;-Text oben klicken, um diese Box zu schließen, wenn du sie nicht brauchst. Sie wird geschlossen bleiben, auch wenn du eine andere Seite öffnest.<br>Ganz unten auf der Seite findest du die Fußzeile, welche Urheberrechts-, Lizenz- und Versionsinformationen enthält."
 }

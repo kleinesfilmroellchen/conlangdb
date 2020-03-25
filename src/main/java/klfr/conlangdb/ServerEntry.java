@@ -52,10 +52,15 @@ public class ServerEntry extends CObject {
 				}
 				var time = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)
 						.format(record.getInstant().atZone(ZoneId.systemDefault()));
-				var level = record.getLevel().getLocalizedName().substring(0, Math.min(record.getLevel().getLocalizedName().length(), 6));
+				var level = record.getLevel().getLocalizedName().substring(0,
+						Math.min(record.getLevel().getLocalizedName().length(), 6));
 				var logName = record.getLoggerName();// "%s.%s".formatted(record.getSourceClassName(),
 														// record.getSourceMethodName());
-				return "[%s %-40s |%6s] %s%n".formatted(time, logName, level, msg);
+
+				return "[%s %-40s |%6s] %s%n".formatted(time, logName, level, msg) + (record.getThrown() == null ? ""
+						: f("EXCEPTION: %s | Stack trace:%n%s", record.getThrown().toString(),
+								Arrays.asList(record.getThrown().getStackTrace()).stream().map(x -> x.toString())
+										.collect(() -> new StringBuilder(), (builder, str) -> builder.append("in ").append(str).append(System.lineSeparator()), (b1, b2) -> b1.append(b2) )));
 			}
 		});
 		LogManager.getLogManager().reset();

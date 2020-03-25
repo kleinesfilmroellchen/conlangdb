@@ -11,8 +11,21 @@
 	"t--eight": "eight",
 	"t--nine": "nine",
 	"t--ten": "ten",
+
 	"t--conlangdb": "ConlangDB",
-	"t--title-mainpage": "Main page",
 	"t--home": "Home",
-	"t--languages": "Languages"
+	"t--languages": "Languages",
+	"t--dictionary": "Words",
+	"t--attributes": "Word attributes",
+	"t--no-lang-selected": "No language selected",
+	"t--help": "Help",
+	"t--version": "Version",
+	"t--copyright": "Copyright",
+	"t--license-info": "This project is licensed under the AGPL 2.0 license.",
+
+	"t--welcomemsg": "Welcome to ConlangDB. Please refer to the help sidebar if you want to know how to use the Web interface. To get started, select a language that you want to work on by opening the &ldquo;Language&rdquo; menu.",
+	"t--conlangs": "Constructed languages",
+
+	"t--title-mainpage": "Main page",
+	"t--helptext-mainpage": "This is the main page. You can find statistics about your database on here. Use the navigation bar on the top to open different subpages and menues. Just click on any one of them to try them out.<br>This help box is available for each and every subpage, and provides helpful information for the page you're currently on. You can click on the &ldquo;Help&rdquo; text up top to close this box, if you don't need it. It will also stay closed between pages.<br>On the very bottom is the page footer, which provides copyright, license and version information."
 }

@@ -1,6 +1,18 @@
 <!-- Body header, from header.html -->
-<header><div id="navbar">
-		<div><span class="t--home"></span></div>
-		<div><span class="t--languages"></span></div>
-</div></header>
+<header>
+	<template id="language-selection-template"><a id="language-from"></a> → <a id="language-to"></a></template>
+
+	<img src="/img/logo.png" alt="ConlangDB logo" class="logo">
+	<input type="checkbox" id="nav-toggle" class="nav-toggle">
+	<nav>
+		<ul>
+			<li><a class="t--home" href="/"></a></li>
+			<li><a class="t--languages" href="/languages"></a></li>
+			<li id="language-selection"></li>
+			<li><a href="/words" class="t--dictionary"></a></li>
+			<li><a href="/language/attribute" class="t--attributes"></a></li>
+		</ul>
+	</nav>
+	<label for="nav-toggle" class="nav-toggle-label"><span></span></label>
+</header>
 <!-- End of header.html -->

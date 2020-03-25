@@ -2,6 +2,7 @@ package klfr.conlangdb.http;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -33,9 +34,7 @@ public class TkLog extends CObject implements Take {
 			log.info("%6s %s from %s".formatted(rqline.method(), rqline.uri(), remote));
 			return sub.act(socketrq);
 		} catch (Exception e) {
-			log.severe(() -> String.format("Exception in Take: %s%n%s", e.getLocalizedMessage(), String.join(
-					System.lineSeparator(),
-					Arrays.asList(e.getStackTrace()).stream().map(x -> x.toString()).collect(Collectors.toList()))));
+			log.log(Level.SEVERE, "Exception in Take.", e);
 			throw new RuntimeException(e);
 		}
 	}

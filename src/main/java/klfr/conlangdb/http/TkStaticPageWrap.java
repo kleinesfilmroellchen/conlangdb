@@ -16,6 +16,8 @@ import java.util.logging.Logger;
 import org.takes.Request;
 import org.takes.Response;
 import org.takes.Take;
+import org.takes.facets.cookies.RqCookies;
+import org.takes.facets.cookies.RsWithCookie;
 import org.takes.rq.RqHeaders;
 import org.takes.rs.RsWithHeader;
 import org.takes.rs.RsWithType;
@@ -50,10 +52,15 @@ public class TkStaticPageWrap extends CObject implements Take {
 					.stream().map(s -> s.split("\\;")[0]).findFirst().orElse("en");
 			log.fine("language " + language);
 			var w = new StringWriter();
-			new InputStreamReader(sequencify(streamify("<!DOCTYPE html>\n<html>                     "),
+			new InputStreamReader(sequencify(streamify("<!DOCTYPE html>\n<html>"),
 					CResources.openBinary("html/head.html").get(),
-					streamify("<script>SETTINGS.pagename = \"" + pagename + "\";</script></head><body onload=\"bodyLoaded()\">"),
-					CResources.openBinary("html/header.html").get(), prepared.body(), streamify("</body></html>")))
+					streamify("<script>SETTINGS.pagename = \"" + pagename + "\";</script></head><body onload=\"bodyLoaded()\">\n"),
+					CResources.openBinary("html/header.html").get(),
+					streamify("<section id=\"page\">"),
+					CResources.openBinary("html/prebody.html").get(),
+					prepared.body(),
+					CResources.openBinary("html/postbody.html").get(),
+					streamify("</section></body></html>")), Charset.forName("utf-8"))
 							.transferTo(w);
 			var body = w.toString();
 			log.finer(body);
@@ -67,8 +74,7 @@ public class TkStaticPageWrap extends CObject implements Take {
 					try {
 						return streamify(body);
 					} catch (Throwable t) {
-						log.log(Level.SEVERE, () -> f("exception %s%n%s", t,
-								String.join("\n", Arrays.asList(t.getStackTrace().toString()))));
+						log.log(Level.SEVERE, "Exception in Body creation.", t);
 						throw t;
 					}
 				}
@@ -77,7 +83,7 @@ public class TkStaticPageWrap extends CObject implements Take {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
+	} 
 
 	/**
 	 * Makes a UTF-8 encoded input stream from the string.

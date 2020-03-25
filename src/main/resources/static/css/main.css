@@ -1,10 +1,276 @@
+/* Settings and variables */
+*, *::before, *::after {
+	box-sizing: border-box;
+}
+:root {
+	/* Define accent colors */
+	--background: white;
+	--foreground: black;
+	--accent-1: #55f162e5;
+	--accent-2: #3bf3e4;
+	--accent-3: #2c6daa;
+}
+
+/*All the dark theme does is redefine the foreground and background colors.*/
+@media (prefers-color-scheme: dark) {
+	:root {
+		--background: #272727;
+		--foreground: white;
+	}
+}
+
+/* Basic styling */
 body {
+	position: absolute;
+	top: 0;
 	padding: 0;
 	margin: 0;
-	font-family: 'Candara', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+	width: 100vw;
+	height: 100vh;
+	font-family: 'Noto Sans';
 	font-size: 13pt;
+	background: var(--background);
+	color: var(--foreground);
 }
 
 h1, h2, h3, h4, h5, h6 {
-	font-family: fantasy;
+	font-family: Caveat, 'Noto Sans';
+	font-size: 140%;
+}
+h1 { font-size: 300%; }
+h2 { font-size: 200%; }
+h3 { font-size: 180%; }
+h4 { font-size: 160%; }
+
+a {
+	color: var(--accent-2);
+	text-decoration: none;
+}
+a:visited {
+	color: var(--accent-3);
+}
+
+/* CSS GRID 4THEWIN! */
+#page {
+	display: grid;
+	min-height: 250px;
+}
+/*These 20 lines make the page responsive. LITERALLY. WAS IT THIS HARD, WORDPRESS?*/
+@media screen and (min-width: 700px) {
+	#page {
+		grid-template-areas: "main   help"
+							 "footer footer";
+		grid-template-columns: auto 30%;
+		grid-template-rows: auto 15mm;
+		margin: 2.5cm 7mm 0;
+	}
+}
+@media screen and (max-width: 699px) {
+	#page {
+		grid-template-areas: "main"
+							 "help"
+							 "footer";
+		grid-template-columns: 1fr;
+		grid-template-rows: auto auto auto;
+		margin: 2.5cm 5% 0;
+	}
+}
+
+/*remove spacings for all direct children of the main layouter*/
+#page >* {
+	padding: 0;
+	margin: 0;
+}
+
+aside {
+	grid-area: help;
+	text-align: justify;
+	text-justify: auto;
+	width: 100%;
+}
+
+main {
+	grid-area: main;
+}
+
+footer {
+	grid-area: footer;
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	vertical-align: middle;
+}
+footer >* {
+	margin: 0 1em;
+}
+
+/* Help toggle logic */
+#help-toggle:checked ~ #helptext {
+	display: none;
+}
+#help-toggle {
+	position: absolute;
+    bottom: 2000px;
+}
+#help-toggle-label:hover {
+	cursor: s-resize;
+}
+#help-toggle:checked ~ #help-toggle-label:hover {
+	cursor: help;
+}
+
+/* Navigation styles */
+header {
+	background: var(--accent-1);
+	text-align: center;
+	position: fixed;
+	width: 100%;
+	z-index: 9999;
+}
+
+header .logo {
+	margin: 0.5rem 0;
+	height: 1.5cm;
+}
+
+.nav-toggle {
+	position: absolute;
+	height: 0;
+	top: -200px;
+}
+.nav-toggle-label {
+	position: absolute;
+	top:0;
+	left:0;
+	margin-left: 1em;
+	height: 100%;
+	display: flex;
+	align-items: center;
+}
+.nav-toggle-label span,
+.nav-toggle-label span::after,
+.nav-toggle-label span::before {
+	display: block;
+	background: var(--background);
+	width: 2em;
+	height: 2px;
+	border-radius: 2px;
+	position: relative;
+}
+.nav-toggle-label span::after,
+.nav-toggle-label span::before  {
+	content: '';
+	position: absolute;
+}
+.nav-toggle-label span::before {
+	bottom: 10px;
+}
+.nav-toggle-label span::after {
+	top: 10px;
+}
+
+nav {
+	position: absolute;
+	text-align: left;
+	top:  100%;
+	left: 0;
+	background: var(--accent-1);
+	width: 100%;
+	transform: scale(1, 0);
+	transform-origin: top;
+	transition: transform 400ms ease-in-out;
+}
+
+nav ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+nav li {
+	margin-bottom: 1em;
+	margin-left: 1em;
+}
+
+nav li {
+	color: var(--background);
+	font-size: 1.2rem;
+	text-transform: uppercase;
+	opacity: 0;
+	transition: opacity 150ms ease;
+}
+/*remove default styling for links*/
+nav a, nav a:visited {
+	color: inherit;
+	text-decoration: none;
+}
+
+nav li:hover {
+	color: var(--foreground);
+}
+/* Magic pseudo-class which enables the navbar on checking the checkbox */
+.nav-toggle:checked ~ nav {
+	transform: scale(1,1);
+}
+
+.nav-toggle:checked ~ nav li {
+	opacity: 1;
+	transition: opacity 250ms ease 150ms;
+}
+
+/* Mobile styles */
+@media screen and (min-width: 1000px) {
+	.nav-toggle-label {
+		display: none;
+	}
+
+	header {
+		display: grid;
+		grid-template-columns: 1fr auto minmax(800px, 3fr) 1fr;
+	}
+
+	header .logo {
+		grid-column: 2 / 3;
+	}
+
+	nav {
+		all: unset;
+		grid-column: 3 / 4;
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		margin-top: 0;
+	}
+
+	nav ul {
+		display: flex;
+		justify-content: flex-end;
+	}
+	nav li {
+		opacity: 1;
+		margin-bottom: 0;
+		margin-left: 3em;
+	}
+
+	nav a {
+		opacity: 1;
+		position: relative;
+	}
+	/* fancy bar for links*/
+	nav a::before {
+		content: '';
+		display: block;
+		width: 4px;
+		background: var(--foreground);
+		position: absolute;
+		top: 0;
+		left: -1em;
+		bottom: 0;
+		transform: scale(1,0);
+		transform-origin: bottom;
+		transition: transform ease-in-out 250ms;
+	}
+	nav a:hover::before {
+		transform: scale(1,1);
+	}
 }
