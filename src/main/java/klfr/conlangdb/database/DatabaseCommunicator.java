@@ -58,8 +58,8 @@ public class DatabaseCommunicator extends CObject {
 
 		// initialize the database
 		try {
-			queue.put(new DatabaseCommand.InitDatabaseCmd(con));
 			queue.put(new DatabaseCommand.CreateServerFunctionsCmd(con));
+			queue.put(new DatabaseCommand.InitDatabaseCmd(con));
 		} catch (InterruptedException e) {
 			log.log(Level.SEVERE, "Interrupted while initializing database", e);
 			dbmanagerT.interrupt();
