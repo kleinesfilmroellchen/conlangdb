@@ -47,6 +47,8 @@ create database conlangdb
 grant all privileges on database conlangdb to conlang;
 ```
 
+Unfortunately, creating the PL/Python server functions and procedures requires superuser permissions, as Python is an untrusted language. If you don't want to (or can't) give the conlang user superuser permissions (`alter role conlang superuser;`), you have to adopt this database system in some way that does not require the Python scripts, which may require rewriting all scripts. As this is not an issue for me currently, I will stick with Python because it is a great language.
+
 ### Arguments
 
 (some of these not implemented yet)
