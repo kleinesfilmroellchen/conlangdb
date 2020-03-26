@@ -16,7 +16,7 @@ try:
 			lambda x: code == x['Id'] or code == x['Part1'],
 			# DictReader treats first line as header, the delimiter of tab files are tabs
 			csv.DictReader(res.text.splitlines(), delimiter='\t')))
-		) > 0 # check the result set length
+		) > 0 # check the result set length, if it is zero, we have no real language i.e. a conlang.
 except Exception as e:
 	plpy.info(e)
 	return False
