@@ -1,8 +1,5 @@
 package klfr.conlangdb.http;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
@@ -10,14 +7,11 @@ import org.json.JSONObject;
 import org.takes.Response;
 import org.takes.facets.fork.RqRegex;
 import org.takes.facets.fork.TkRegex;
-import org.takes.rs.RsEmpty;
-import org.takes.rs.RsText;
 import org.takes.rs.RsWithBody;
 import org.takes.rs.RsWithHeader;
 import org.takes.rs.RsWithType;
 
 import klfr.conlangdb.CObject;
-import klfr.conlangdb.CResources;
 import klfr.conlangdb.TranslationProvider;
 
 /**

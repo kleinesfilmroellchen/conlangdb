@@ -35,7 +35,7 @@ class DatabaseManagerThread extends Thread {
 	 */
 	private Connection databaseConnection;
 
-	private BlockingQueue<DatabaseCommand> commandQueue;
+	private final BlockingQueue<DatabaseCommand<Object>> commandQueue;
 
 	public Connection getConnection() {
 		return databaseConnection;
@@ -48,13 +48,15 @@ class DatabaseManagerThread extends Thread {
 	 * Constructs the database manager thread with its arguments and sets important
 	 * properties on the parent.
 	 */
-	public DatabaseManagerThread(final Arguments args, Lock signal, Condition cond) {
+	public DatabaseManagerThread(final Arguments args, final Lock signal, final Condition cond,
+			final BlockingQueue<DatabaseCommand<Object>> queue) {
 		super(Thread.currentThread().getThreadGroup(), "DatabaseManager");
 		super.setDaemon(true);
 		log.fine(f("CONSTRUCT %s", this.getClass().getCanonicalName()));
 		this.args = args;
 		this.signal = signal;
 		this.cond = cond;
+		this.commandQueue = queue;
 	}
 
 	/**
@@ -90,40 +92,37 @@ class DatabaseManagerThread extends Thread {
 				signal.unlock();
 			}
 			try {
-				DatabaseCommand nextCommand;
+				DatabaseCommand<Object> nextCommand;
 				while (true) {
 					// blocks while queue is empty
 					nextCommand = commandQueue.take();
-					log.fine(f("RUN COMMAND %s", nextCommand));
-					nextCommand.run();
-					if (nextCommand.isDone() && !nextCommand.isCancelled())
+					log.fine(f("RUN COMMAND %s", String.valueOf(nextCommand)));
+					final var executable = nextCommand.getTask(databaseConnection);
+					executable.run();
+					if (executable.isDone() && !executable.isCancelled())
 						try {
-							nextCommand.get();
-						} catch (ExecutionException e) {
+							executable.get();
+						} catch (final ExecutionException e) {
 							log.log(Level.SEVERE, "Command execution caused exception.", e);
 						}
 					else {
 						// TODO: restart the command - is this a good idea?
-						commandQueue.add(nextCommand.clone(databaseConnection));
+						commandQueue.add(nextCommand.clone());
 					}
 				}
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				log.warning("Interrupted on main loop");
 				return;
 			}
-		} catch (URISyntaxException e) {
+		} catch (final URISyntaxException e) {
 			log.log(Level.SEVERE, f("Invalid URL resulted from database name %s.", args.databaseName), e);
 			// kill the database manager
 			Thread.currentThread().interrupt();
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			log.log(Level.SEVERE, f("SQL exception occurred while opening database %s: %s (%d).", args.databaseName,
 					e.getMessage(), e.getErrorCode()), e);
 			Thread.currentThread().interrupt();
 		}
-	}
-
-	public void setQueue(BlockingQueue<DatabaseCommand> queue) {
-		commandQueue = queue;
 	}
 
 }

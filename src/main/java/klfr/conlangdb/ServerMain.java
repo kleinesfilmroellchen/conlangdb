@@ -82,6 +82,7 @@ public class ServerMain extends CObject {
 			//// Setup the Takes server architecture
 			// Basic frontent using parallel threads, logging and error handling
 			new FtBasic(new BkParallel(new BkBasic(new TkLog(new TkFallback(new TkFork(
+					//// STATIC
 					// Static JavaScript
 					new FkRegex("/js/.+", new TkWithType(new TkFiles(new File("./out/res/static")), "text/javascript")),
 					// Static CSS
@@ -91,20 +92,25 @@ public class ServerMain extends CObject {
 					// Favicon
 					new FkRegex(Pattern.quote("/favicon.ico"),
 							new TkWithType(new TkFiles(new File("./out/res/static/img")), "image/png")),
+					//// PAGES
 					// Main page
 					new FkRegex("/", new TkStaticPageWrap(new TkMainPage(), "mainpage")),
+					//// API
 					// Translation JSON maps
-					new FkRegex("\\/translation\\/([a-z]{2,3})(?:\\_([A-Z]{2,3}))?", new TkTranslations())
-					),
+					new FkRegex("\\/translation\\/([a-z]{2,3})(?:\\_([A-Z]{2,3}))?", new TkTranslations()),
+					// Statistics
+					new FkRegex(Pattern.quote("/statistics"), new TkStatistics())),
 					// Fallback for handling server errors and error codes
 					new FbChain(new FbFail(HttpStatusCode.NOT_FOUND), new FbFail(HttpStatusCode.METHOD_UNALLOWED),
+							new FbFail(HttpStatusCode.BAD_REQUEST), new FbFail(HttpStatusCode.INTERNAL_SERVER_ERROR),
 							new Fallback() {
 								public org.takes.misc.Opt<Response> route(final RqFallback req) {
 									log.severe("Server exception " + req);
 									return new org.takes.misc.Opt.Single<Response>(
 											new RsHtml("oops, something went terribly wrong!"));
 								}
-							})))), 10),
+							})))),
+					10),
 					// Start server on given port and run it forever
 					arguments.port).start(Exit.NEVER);
 		} catch (Exception e) {
