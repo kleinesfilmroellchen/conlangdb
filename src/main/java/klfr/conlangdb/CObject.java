@@ -15,7 +15,7 @@ public abstract class CObject extends Object implements Cloneable, Serializable 
 	protected static final Logger log = Logger.getLogger("klfr.conlangdb");
 
 	protected CObject() {
-		log.fine(f("CONSTRUCT %s", this.getClass().getCanonicalName()));
+		log.finest(f("CONSTRUCT %s", this.getClass().getCanonicalName()));
 	}
 
 	/**
