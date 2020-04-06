@@ -23,6 +23,12 @@ version = '0.1.0'
 
 sourceCompatibility = 13
 
+// fucking encoding
+compileJava.options.encoding = 'UTF-8'
+tasks.withType(JavaCompile) {
+  options.encoding = "UTF-8"
+}
+
 sourceSets {
 	 main {
 		java {
@@ -47,6 +53,7 @@ sourceSets {
 
 def classname = "$moduleName/klfr.conlangdb.ServerEntry"
 application {
+	applicationDefaultJvmArgs = ["-Dfile.encoding=UTF-8" ]
 	mainClassName = classname
 }
 
