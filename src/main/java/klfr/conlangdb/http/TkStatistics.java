@@ -48,9 +48,7 @@ public class TkStatistics implements Take {
 			final var results = resultMaybe.get();
 			final var responseObject = responseToJSON(results);
 			// return the response
-			final var body = responseObject.toString();
-			return new RsWithHeader(new RsCWrap(new RsWithBody(body)), "Content-Length",
-					Integer.toString(body.length()));
+			return new RsCWrap(new RsJSON(responseObject));
 		} catch (JSONException e) {
 			log.log(Level.WARNING, "JSON exception in statistics", e);
 			return new RsCWrap(new RsEmpty(), HttpStatusCode.BAD_REQUEST);

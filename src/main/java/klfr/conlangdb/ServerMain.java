@@ -1,31 +1,35 @@
 package klfr.conlangdb;
 
-import klfr.conlangdb.http.*;
-import static klfr.conlangdb.http.TkStaticPageWrap.*;
-
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.net.InetSocketAddress;
-import java.net.http.*;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.concurrent.*;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.takes.Response;
+import org.takes.facets.fallback.Fallback;
+import org.takes.facets.fallback.FbChain;
+import org.takes.facets.fallback.RqFallback;
+import org.takes.facets.fallback.TkFallback;
+import org.takes.facets.fork.FkRegex;
+import org.takes.facets.fork.FkTypes;
+import org.takes.facets.fork.TkFork;
 import org.takes.http.BkBasic;
 import org.takes.http.BkParallel;
 import org.takes.http.Exit;
 import org.takes.http.FtBasic;
-import org.takes.facets.fork.*;
-import org.takes.facets.fallback.*;
-import org.takes.tk.*;
-import org.takes.rs.*;
-import org.takes.*;
+import org.takes.rs.RsHtml;
+import org.takes.tk.TkFiles;
+import org.takes.tk.TkWithType;
+
+import klfr.conlangdb.http.FbFail;
+import klfr.conlangdb.http.HttpStatusCode;
+import klfr.conlangdb.http.TkLanguagePage;
+import klfr.conlangdb.http.TkListAPI;
+import klfr.conlangdb.http.TkLog;
+import klfr.conlangdb.http.TkMainPage;
+import klfr.conlangdb.http.TkStaticPageWrap;
+import klfr.conlangdb.http.TkStatistics;
+import klfr.conlangdb.http.TkTranslations;
 
 /**
  * Main class of the server.
@@ -76,7 +80,7 @@ public class ServerMain extends CObject {
 	 */
 	public void start() {
 		try {
-			log.info("Server Main method entered");
+			log.info("Server Main method entered. ÄÄÖÖÜÜ");
 			log.config(() -> arguments.toString());
 
 			//// Setup the Takes server architecture
@@ -95,6 +99,15 @@ public class ServerMain extends CObject {
 					//// PAGES
 					// Main page
 					new FkRegex("/", new TkStaticPageWrap(new TkMainPage(), "mainpage")),
+					// Languages page: depending on accept header, serve different page
+					new FkRegex(Pattern.quote("/language/list"),
+							new TkFork(
+									new FkTypes("text/html", new TkStaticPageWrap(new TkLanguagePage(),
+											new TkLanguagePage.Header(),
+											"languages")),
+									new FkTypes("application/json",
+											new TkListAPI(TkListAPI.languageQueryBuilder, List.of("id", "name"),
+													"id")))),
 					//// API
 					// Translation JSON maps
 					new FkRegex("\\/translation\\/([a-z]{2,3})(?:\\_([A-Z]{2,3}))?", new TkTranslations()),

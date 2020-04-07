@@ -37,9 +37,7 @@ public class TkTranslations extends CObject implements TkRegex {
 		String lang = rx.group(1), region = rx.group(2);
 		JSONObject translation = TranslationProvider.getTranslation(lang, Optional.ofNullable(region));
 		log.finer("Translation: " + translation.toString(2));
-		return new RsWithHeader(
-				new RsWithType(new RsWithBody(translation.toString()), "application/json", Charset.forName("utf-8")),
-				"Connection", "close");
+		return new RsCWrap(new RsJSON(translation));
 	}
 
 	@Override

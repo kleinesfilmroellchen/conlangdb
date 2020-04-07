@@ -40,7 +40,7 @@ public class ServerEntry extends CObject {
 		});
 		// create a handler with custom compact one-line formatting
 		var ch = new ConsoleHandler();
-		ch.setLevel(Level.FINE);
+		ch.setLevel(Level.FINER);
 		ch.setFormatter(new Formatter() {
 			@Override
 			public String format(LogRecord record) {

@@ -1,5 +1,7 @@
 {
 	"$schema": "./translation-schema.json",
+	"t--true": "Yes",
+	"t--false": "No",
 	"t--zero": "zero",
 	"t--one": "one",
 	"t--two": "two",
@@ -26,6 +28,22 @@
 	"t--welcomemsg": "Welcome to ConlangDB. Please refer to the help sidebar if you want to know how to use the Web interface. To get started, select a language that you want to work on by opening the &ldquo;Language&rdquo; menu.",
 	"t--conlangs": "Constructed languages",
 
+	"t--statistics": "Statistics",
+	"t--statistic-languages": "<span id=\"language-count\"></span> languages, <span id=\"conlang-count\"></span> constructed languages.",
+	"t--statistic-words": "<span id=\"word-count\"></span> words, <span id=\"word-count-lang1\"></span> in language <span class=\"lang1\"></span> and  <span id=\"word-count-lang2\"></span> in language <span class=\"lang2\"></span>.",
+	"t--statistic-definitions": "<span id=\"definition-count\"></span> definitions, <span id=\"definition-count-lang1\"></span> in language <span class=\"lang1\"></span> and  <span id=\"definition-count-lang2\"></span> in language <span class=\"lang2\"></span>.",
+	"t--statistic-wordattributes": "<span id=\"wordattribute-count\"></span> definitions, <span id=\"wordattribute-count-lang1\"></span> in language <span class=\"lang1\"></span> and  <span id=\"wordattribute-count-lang2\"></span> in language <span class=\"lang2\"></span>.",
+
+	"t--language-name": "Name",
+	"t--language-name-en": "Name (English)",
+	"t--language-id": "Language code",
+	"t--isconlang": "Constructed language",
+	"t--language-word-count": "Words",
+	"t--language-list-caption": "Table listing all languages in the database.",
+
 	"t--title-mainpage": "Main page",
-	"t--helptext-mainpage": "This is the main page. You can find statistics about your database on here. Use the navigation bar on the top to open different subpages and menues. Just click on any one of them to try them out.<br>This help box is available for each and every subpage, and provides helpful information for the page you're currently on. You can click on the &ldquo;Help&rdquo; text up top to close this box, if you don't need it. It will also stay closed between pages.<br>On the very bottom is the page footer, which provides copyright, license and version information."
+	"t--helptext-mainpage": "This is the main page. You can find statistics about your database on here. Use the navigation bar on the top to open different subpages and menues. Just click on any one of them to try them out.<br>This help box is available for each and every subpage, and provides helpful information for the page you're currently on. You can click on the &ldquo;Help&rdquo; text up top to close this box, if you don't need it. It will also stay closed between pages.<br>On the very bottom is the page footer, which provides copyright, license and version information.",
+
+	"t--title-languages": "Languages",
+	"t--helptext-languages": "On this page all languages in your database are listed. You can click on any language to view its details or use the &ldquo;Create Language&rdquo; button to create a new language.<br>Clicking on the column before the language's name will select the language for translation from or to. The current language selected for translating from is marked with a left-pointing arrow, and the current language selected for translating to is marked with a right-pointing arrow. Clicking on an unselected language marks it for translating to and deletes the marking for the current from-language, with the old to-language becoming the new from-language. Clicking one of the selected languages switches their positions."
 }

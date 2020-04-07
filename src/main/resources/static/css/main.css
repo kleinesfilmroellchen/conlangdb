@@ -69,6 +69,12 @@ a:visited {
 		grid-template-rows: auto 15mm;
 		margin: 2.5cm 7mm 0;
 	}
+	footer {
+		flex-direction: row;
+	}
+	footer >* {
+		margin: 0 1em;
+	}
 }
 @media screen and (max-width: 699px) {
 	#page {
@@ -78,6 +84,12 @@ a:visited {
 		grid-template-columns: 1fr;
 		grid-template-rows: auto auto auto;
 		margin: 2.5cm 5% 0;
+	}
+	footer {
+		flex-direction: column;
+	}
+	footer >* {
+		margin: 1em 0;
 	}
 }
 
@@ -101,12 +113,8 @@ main {
 footer {
 	grid-area: footer;
 	display: flex;
-	flex-direction: row;
 	align-items: flex-start;
 	vertical-align: middle;
-}
-footer >* {
-	margin: 0 1em;
 }
 
 /* Help toggle logic */
@@ -223,7 +231,39 @@ nav li:hover {
 	transition: opacity 250ms ease 150ms;
 }
 
-/* Mobile styles */
+/* Table styles */
+table caption {
+	display: none;
+}
+table.no-edge {
+	border: none;
+}
+/* minimum spacings for table contents */
+td, th {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+tr {
+	padding-top: 0.25rem;
+}
+
+input {
+	color: inherit;
+	background: none;
+}
+
+/* Language select button */
+input[type="button"].language-select {
+	background: none;
+	border: none;
+	padding: 0;
+	margin: 0;
+	font-size: 110%;
+	width: 2em;
+	height: 2em;
+}
+
+/* Large Desktop styles */
 @media screen and (min-width: 1100px) {
 	.nav-toggle-label {
 		display: none;

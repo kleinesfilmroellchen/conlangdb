@@ -66,7 +66,7 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 	 * generic type argument of the class. As some commands do not return anything
 	 * and null is evil, this is an Optional which is equivalent to an FP Maybe.
 	 */
-	private final Function<Connection, Optional<T>> toExecute;
+	protected final Function<Connection, Optional<T>> toExecute;
 
 	/**
 	 * Last task that was initialized by this command, possibly nothing. Volatile
@@ -87,6 +87,25 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 	 */
 	private DatabaseCommand(final Function<Connection, Optional<T>> toExecute) {
 		this.toExecute = toExecute;
+	}
+
+	/**
+	 * Create a simple no argument database command from a function that defines
+	 * what action will be executed by the command. This is the preferred method of
+	 * creating database commands on-the-fly.
+	 * 
+	 * @param toExecute A function taking a database connection and optionally
+	 *                  returning a value of any type. It is recommended to set the
+	 *                  return type to Object if nothing is ever returned.
+	 * @return A new database command that will simply execute the given function
+	 *         when it is processed.
+	 */
+	public static <U> DatabaseCommand<U> from(final Function<Connection, Optional<U>> toExecute) {
+		return new NoArgumentCmd<U>(toExecute) {
+			public String getReadableName() {
+				return "SimpleExternalCmd";
+			}
+		};
 	}
 
 	/**
@@ -201,10 +220,10 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 	/**
 	 * Wrapper for argumentless commands.
 	 */
-	public static abstract class NoArgumentCmd extends DatabaseCommand<Object> {
+	public static class NoArgumentCmd<T> extends DatabaseCommand<T> {
 		private static final long serialVersionUID = 1L;
 
-		public NoArgumentCmd(final Function<Connection, Optional<Object>> toExecute) {
+		public NoArgumentCmd(final Function<Connection, Optional<T>> toExecute) {
 			super(toExecute);
 		}
 
@@ -214,13 +233,13 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 		}
 
 		@Override
-		public <T> Optional<T> getArgument(final int index) {
+		public <U> Optional<U> getArgument(final int index) {
 			return Optional.empty();
 		}
 
 		@Override
-		public DatabaseCommand<Object> clone() {
-			return new InitDatabaseCmd();
+		public DatabaseCommand<T> clone() {
+			return new NoArgumentCmd<T>(this.toExecute);
 		}
 	}
 
@@ -232,7 +251,7 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 	 * Master comand for deleting the database:
 	 * {@code drop table tlanguage cascade; drop table tword cascade; drop table reltranslation cascade; drop table relattributeforword cascade; drop table tdefinition cascade; drop table twordattribute cascade;}
 	 */
-	public static class InitDatabaseCmd extends NoArgumentCmd {
+	public static class InitDatabaseCmd extends NoArgumentCmd<Object> {
 
 		public InitDatabaseCmd() {
 			super(con -> {
@@ -376,7 +395,7 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 	 * function file without the .py ending relative to the server function
 	 * directory is given.
 	 */
-	public static class CreateServerFunctionsCmd extends NoArgumentCmd {
+	public static class CreateServerFunctionsCmd extends NoArgumentCmd<Object> {
 
 		/**
 		 * Layout of the first line of each python file that specifies the SQL code to
@@ -580,6 +599,85 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 		@Override
 		public DatabaseCommand<Map<String, Map<String, Object>>> clone() {
 			return new StatisticsCmd(requested);
+		}
+
+	}
+
+	/**
+	 * Simple general command that retrieves entries from a table. The user can
+	 * specify what table, which fields to recieve and the limits of the query.
+	 */
+	public static class TableEntriesCmd extends DatabaseCommand<ResultSet> {
+		private static final long serialVersionUID = 1L;
+
+		private final String table;
+		private final Iterable<String> fields;
+		private final Integer offset;
+		private final Integer count;
+
+		/**
+		 * Creates a TableEntriesCmd that retrieves entries from a table. Note that
+		 * except for the limits, all parameters are not sanitized and interpolated
+		 * directly into the query. <strong>Never pass user strings directly to this
+		 * constructor!</strong>
+		 * 
+		 * @param table  The table's name that should be accessed. Follows normal SQL
+		 *               conventions and is case insensitive.
+		 * @param fields A list of field names to be retrieved from the table. As these
+		 *               are directly interpolated, they may be computed fields
+		 *               ({@code fielda + fieldb}) or summary fields ({@code count(*)}).
+		 * @param offset The first element's index of the table to be retrieved. The
+		 *               elements are auto-sorted to the first given field name.
+		 *               {@code offset} is zero-based and so 0 will give a result table
+		 *               starting at the first element in the entire table.
+		 * @param count  How many elements to return. May be zero, in this case, all
+		 *               elements are returned. Use with caution, the query might take
+		 *               long to process and return a large result set.
+		 */
+		public TableEntriesCmd(String table, Iterable<String> fields, int offset, int count) {
+			super(con -> {
+				final String fieldString = String.join(", ", fields);
+				final String query = "select " + fieldString + " from " + table + " limit "
+						+ (count > 0 ? Integer.toString(count) : "all") + " offset " + Integer.toString(offset) + ";";
+				log.fine(query);
+				try {
+					final var stmt = con.createStatement();
+					return Just(stmt.executeQuery(query));
+				} catch (SQLException e) {
+					log.log(Level.SEVERE, "SQL exception in single table SELECT.", e);
+					return Nothing();
+				}
+			});
+			this.table = table;
+			this.fields = fields;
+			this.offset = offset;
+			this.count = count;
+		}
+
+		@Override
+		public Stream<Object> getArguments() {
+			return Stream.of(table, fields, offset, count);
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public <U> Optional<U> getArgument(int index) {
+			switch (index) {
+				case 0:
+					return (Optional<U>) Just(table);
+				case 1:
+					return (Optional<U>) Just(fields);
+				case 2:
+					return (Optional<U>) Just(offset);
+				case 3:
+					return (Optional<U>) Just(count);
+			}
+			return Nothing();
+		}
+
+		@Override
+		public DatabaseCommand<ResultSet> clone() {
+			return new TableEntriesCmd(table, fields, offset, count);
 		}
 
 	}

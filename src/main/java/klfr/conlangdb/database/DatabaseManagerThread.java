@@ -106,8 +106,8 @@ class DatabaseManagerThread extends Thread {
 							log.log(Level.SEVERE, "Command execution caused exception.", e);
 						}
 					else {
-						// TODO: restart the command - is this a good idea?
-						commandQueue.add(nextCommand.clone());
+						// TODO: restart the command without cloning - is this a good idea?
+						commandQueue.add(nextCommand);
 					}
 				}
 			} catch (final InterruptedException e) {

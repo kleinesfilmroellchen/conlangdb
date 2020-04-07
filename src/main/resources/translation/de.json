@@ -1,5 +1,7 @@
 {
 	"$schema": "./translation-schema.json",
+	"t--true": "Ja",
+	"t--false": "Nein",
 	"t--zero": "Null",
 	"t--one": "Eins",
 	"t--two": "Zwei",
