@@ -1,5 +1,6 @@
 package klfr.conlangdb.http;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.takes.*;
@@ -24,7 +25,7 @@ public class FbFail extends CObject implements Fallback {
 		if (code.code != req.code())
 			return new Opt.Empty<Response>();
 		else {
-			log.warning("%s Request exited with code %s".formatted(req, code));
+			log.log(Level.WARNING, "Request %s exited with code %s".formatted(req, code), req.throwable());
 			return new Opt.Single<Response>(
 					new RsWithStatus(new RsText(code.standardMessage), code.code, code.standardMessage));
 		}

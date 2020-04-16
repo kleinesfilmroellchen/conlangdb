@@ -1,10 +1,6 @@
 // main.js: Master JavaScript
-/*
- * Global settings object SETTINGS.
- * Attributes:
- *     pagename: Name of page that should appear in the title.
- * 
- */
+const pagename = document.querySelector('meta[name="pageid"]').content;
+console.log(pagename);
 
 const translationPromise = getPageTranslation();
 
@@ -20,6 +16,7 @@ function bodyLoaded() {
 	loadEvents.forEach(evt => evt());
 }
 
+
 const loadEvents = [];
 loadEvents.push(() => {
 	// set the help section visibility
@@ -29,7 +26,10 @@ loadEvents.push(() => {
 	translationPromise.then(translations => {
 		// Page title
 		const generalName = translations['t--conlangdb'];
-		title.innerHTML = generalName + " — " + translations[`t--title-${SETTINGS.pagename}`];
+		title.innerHTML = generalName + " — " + translations[`t--title-${pagename}`];
+
+		// Page description
+		document.querySelector('meta[name="description"]').content = translations[`t--description-${pagename}`];
 
 		// Translations
 		for (const translationKey in translations) {
@@ -59,7 +59,7 @@ loadEvents.push(() => {
 		}
 
 		// Help text
-		document.querySelector("#helptext").innerHTML = translations[`t--helptext-${SETTINGS.pagename}`];
+		document.querySelector("#helptext").innerHTML = translations[`t--helptext-${pagename}`];
 
 		// Date and time footer
 		document.querySelector("#timedate").innerHTML = (new Date()).toLocaleString(undefined, { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric", timeZoneName: undefined })

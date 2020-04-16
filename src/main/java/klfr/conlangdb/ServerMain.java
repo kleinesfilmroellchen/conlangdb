@@ -18,11 +18,14 @@ import org.takes.http.BkParallel;
 import org.takes.http.Exit;
 import org.takes.http.FtBasic;
 import org.takes.rs.RsHtml;
+import org.takes.tk.TkEmpty;
 import org.takes.tk.TkFiles;
+import org.takes.tk.TkWithHeaders;
 import org.takes.tk.TkWithType;
 
 import klfr.conlangdb.http.FbFail;
 import klfr.conlangdb.http.HttpStatusCode;
+import klfr.conlangdb.http.TkFilesAdvanced;
 import klfr.conlangdb.http.TkLanguagePage;
 import klfr.conlangdb.http.TkListAPI;
 import klfr.conlangdb.http.TkLog;
@@ -88,26 +91,27 @@ public class ServerMain extends CObject {
 			new FtBasic(new BkParallel(new BkBasic(new TkLog(new TkFallback(new TkFork(
 					//// STATIC
 					// Static JavaScript
-					new FkRegex("/js/.+", new TkWithType(new TkFiles(new File("./out/res/static")), "text/javascript")),
+					new FkRegex("/js/.+", new TkFilesAdvanced("static")),
 					// Static CSS
-					new FkRegex("/css/.+", new TkWithType(new TkFiles(new File("./out/res/static")), "text/css")),
+					new FkRegex("/css/.+", new TkFilesAdvanced("static")),
 					// Static images
-					new FkRegex("/img/.+", new TkFiles("./out/res/static")),
+					new FkRegex("/img/.+", new TkFilesAdvanced("static")),
 					// Favicon
-					new FkRegex(Pattern.quote("/favicon.ico"),
-							new TkWithType(new TkFiles(new File("./out/res/static/img")), "image/png")),
-					//// PAGES
+					new FkRegex(Pattern.quote("/favicon.ico"), new TkFilesAdvanced("static/img")),
+					//// PAGES / PAGE-API COMBINATION
 					// Main page
 					new FkRegex("/", new TkStaticPageWrap(new TkMainPage(), "mainpage")),
-					// Languages page: depending on accept header, serve different page
-					new FkRegex(Pattern.quote("/language/list"),
-							new TkFork(
-									new FkTypes("text/html", new TkStaticPageWrap(new TkLanguagePage(),
-											new TkLanguagePage.Header(),
+					// Language list page/api
+					new FkRegex(Pattern.quote("/language/list"), new TkFork(
+							new FkTypes("text/html",
+									new TkStaticPageWrap(new TkLanguagePage(), new TkLanguagePage.Header(),
 											"languages")),
+							new FkTypes("application/json",
+									new TkListAPI(TkListAPI.languageQueryBuilder, List.of("id", "name"), "id")))),
+					new FkRegex(Pattern.quote("/word/list"),
+							new TkFork(new FkTypes("text/html", new TkStaticPageWrap(new TkEmpty(), "words")),
 									new FkTypes("application/json",
-											new TkListAPI(TkListAPI.languageQueryBuilder, List.of("id", "name"),
-													"id")))),
+											new TkListAPI(TkListAPI.wordQueryBuilder, List.of("text"), "text")))),
 					//// API
 					// Translation JSON maps
 					new FkRegex("\\/translation\\/([a-z]{2,3})(?:\\_([A-Z]{2,3}))?", new TkTranslations()),

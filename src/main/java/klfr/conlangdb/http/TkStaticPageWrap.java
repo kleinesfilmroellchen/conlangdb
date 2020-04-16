@@ -12,14 +12,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.takes.Request;
 import org.takes.Response;
 import org.takes.Take;
 import org.takes.rq.RqHeaders;
-import org.takes.rs.RsGzip;;
+import org.takes.rs.RsGzip;
 import org.takes.rs.RsWithHeaders;
 import org.takes.rs.RsWithType;
 
@@ -40,7 +39,11 @@ public class TkStaticPageWrap extends CObject implements Take {
 	private final Optional<Take> headsub;
 	private final String pagename;
 
-	public TkStaticPageWrap(Take sub, String pagename) {
+	/**
+	 * @param sub      The primary take that provides a response.
+	 * @param pagename ID of the page, used to provide page title and help texts.
+	 */
+	public TkStaticPageWrap(final Take sub, final String pagename) {
 		this.sub = sub;
 		this.pagename = pagename;
 		this.headsub = Nothing();
@@ -55,7 +58,7 @@ public class TkStaticPageWrap extends CObject implements Take {
 	 *                 and its HTTP headers are also included.
 	 * @param pagename ID of the page, used to provide page title and help texts.
 	 */
-	public TkStaticPageWrap(Take sub, Take headsub, String pagename) {
+	public TkStaticPageWrap(final Take sub, final Take headsub, final String pagename) {
 		this.sub = sub;
 		this.pagename = pagename;
 		this.headsub = Just(headsub);
@@ -87,9 +90,9 @@ public class TkStaticPageWrap extends CObject implements Take {
 
 			var w = new StringWriter();
 			new InputStreamReader(
-					sequencify(streamify("<!DOCTYPE html>\n<html>"), CResources.openBinary("html/head.html").get(),
-							streamify("<script>SETTINGS.pagename = \"" + pagename + "\";</script></head>\n"),
-							headPrepared.body(), streamify("<body onload=\"bodyLoaded()\">\n"),
+					sequencify(streamify("<!DOCTYPE html>\n<html lang=\"" + language + "\"><head>\n\t<meta name=\"pageid\" content=\"" + pagename + "\">\n"),
+							CResources.openBinary("html/head.html").get(),
+							headPrepared.body(), streamify("</head><body onload=\"bodyLoaded()\">\n"),
 							CResources.openBinary("html/header.html").get(), streamify("<section id=\"page\">"),
 							CResources.openBinary("html/prebody.html").get(), prepared.body(),
 							CResources.openBinary("html/postbody.html").get(), streamify("</section></body></html>")),

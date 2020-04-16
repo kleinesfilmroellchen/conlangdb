@@ -2,6 +2,7 @@ package klfr.conlangdb.http;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import org.takes.rs.RsWithType;
 import klfr.conlangdb.database.DatabaseCommand;
 import klfr.conlangdb.database.DatabaseCommunicator;
 import klfr.conlangdb.database.SortOrder;
+import klfr.conlangdb.http.TkListAPI.QueryBuilder;
 
 /**
  * An API template which outputs a data list in JSON format to the requestor.
@@ -138,6 +140,15 @@ public class TkListAPI implements Take {
 		sqlTypesSetters.put(java.sql.Types.DATE, key -> (json, rset) -> json.put(key, rset.getDate(key)));
 		sqlTypesSetters.put(java.sql.Types.TIME, key -> (json, rset) -> json.put(key, rset.getTime(key)));
 		sqlTypesSetters.put(java.sql.Types.TIMESTAMP, key -> (json, rset) -> json.put(key, rset.getTimestamp(key)));
+		sqlTypesSetters.put(java.sql.Types.ARRAY, key -> (json, rset) -> {
+			final Array sqlarr = rset.getArray(key);
+			final var jsarr = new JSONArray();
+			final var arrayset = sqlarr.getResultSet();
+			while (arrayset.next()) {
+				jsarr.put(arrayset.getObject(2));
+			}
+			json.put(key, jsarr);
+		});
 	}
 	/** Default setter for unrecognized types. */
 	private static final SQLValueSettingFunction defaultSetter = key -> (json, rset) -> json.put(key,
@@ -193,7 +204,7 @@ public class TkListAPI implements Take {
 			if (offset < 0)
 				offset = -1;
 
-			log.fine("Query päräms: fields %s order %s %s limit %d offset %d".formatted(fields, ordering, order, limit,
+			log.fine("Query params: fields %s order %s %s limit %d offset %d".formatted(fields, ordering, order, limit,
 					offset));
 			final String query = executor.execute(fields, order, ordering, queryParams, offset, limit);
 			log.fine("Resulting query: %s".formatted(query));
@@ -246,7 +257,7 @@ public class TkListAPI implements Take {
 
 			final var json = dbcommand.get().orElse(new JSONArray());
 
-			return new RsCWrap(new RsJSON(json));
+			return new RsWithHeader(new RsCWrap(new RsJSON(json)), "Cache-Control", "public, max-age=10");
 
 		} catch (IllegalArgumentException e1) {
 			log.log(Level.WARNING, "Illegal arguments to data list API.", e1);
@@ -273,6 +284,8 @@ public class TkListAPI implements Take {
 				case "name":
 				case "description":
 				case "isconlang":
+				case "config":
+				case "fonturl":
 					return elt.toLowerCase();
 				case "name-en":
 					return "Name_En as \"name-en\"";
@@ -289,6 +302,46 @@ public class TkListAPI implements Take {
 				+ String.join(", ", fields.stream().map(fieldMapper).filter(x -> x != null).collect(Collectors.toSet()))
 				+ " FROM TLanguage " + " ORDER BY " + properOrdering + " " + order.sql
 				+ (limit >= 0 ? (" LIMIT " + limit) : "") + (offset >= 0 ? (" OFFSET " + offset) : "") + ";";
+	};
+
+	public static final QueryBuilder wordQueryBuilder = (fields, order, orderingName, queryParameters, offset,
+			limit) -> {
+		final Function<String, String> fieldMapper = elt -> {
+			// only valid elements are not nulled
+			switch (elt.toLowerCase()) {
+				case "romanized":
+				case "fonturl":
+					return elt.toLowerCase();
+				case "text":
+					return "Native as text";
+				default:
+					return null;
+			}
+		};
+		var properOrdering = fieldMapper.apply(orderingName);
+		if (properOrdering == null)
+			properOrdering = "ID";
+		try {
+			String languageToId = queryParameters.single("to", null);
+			if (languageToId == null) {
+				// only query words, do not query translations
+				return String.format("SELECT %s FROM TWord ORDER BY %s %s %s;",
+						String.join(", ",
+								fields.stream().map(fieldMapper).filter(x -> x != null).collect(Collectors.toSet())),
+						properOrdering, order.sql,
+						(limit >= 0 ? (" LIMIT " + limit) : "") + (offset >= 0 ? (" OFFSET " + offset) : ""));
+			}
+			return String.format(
+					"SELECT %s, (select Native from TWord translation "+
+					"join RelTranslation on (translation.ID=RelTranslation.WIDOne or translation.ID=RelTranslation.WIDTwo) where (TWord.ID=RelTranslation.WIDOne or TWord.ID=RelTranslation.WIDTwo) ) "+
+					"FROM TWord ORDER BY %s %s %s;",
+					String.join(", ",
+							fields.stream().map(fieldMapper).filter(x -> x != null).collect(Collectors.toSet())),
+					properOrdering, order.sql,
+					(limit >= 0 ? (" LIMIT " + limit) : "") + (offset >= 0 ? (" OFFSET " + offset) : ""));
+		} catch (IOException e) {
+			throw new ExecutionException(e);
+		}
 	};
 
 	/**

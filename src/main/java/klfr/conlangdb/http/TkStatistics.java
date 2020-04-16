@@ -48,7 +48,7 @@ public class TkStatistics implements Take {
 			final var results = resultMaybe.get();
 			final var responseObject = responseToJSON(results);
 			// return the response
-			return new RsCWrap(new RsJSON(responseObject));
+			return new RsWithHeader(new RsCWrap(new RsJSON(responseObject)), "Cache-Control", "public, max-age=60");
 		} catch (JSONException e) {
 			log.log(Level.WARNING, "JSON exception in statistics", e);
 			return new RsCWrap(new RsEmpty(), HttpStatusCode.BAD_REQUEST);

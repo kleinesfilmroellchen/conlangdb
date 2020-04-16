@@ -34,6 +34,14 @@ public class RsCWrap extends CObject implements Response {
 				"Connection", "close");
 	}
 
+	/**
+	 * Simple response with only status code and no body.
+	 * @param status
+	 */
+	public RsCWrap(HttpStatusCode status) {
+		this(new RsText(status.standardMessage), status);
+	}
+
 	public InputStream body() throws IOException {
 		return res.body();
 	}

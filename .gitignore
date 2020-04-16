@@ -10,3 +10,5 @@ out
 # Ignore IDE files
 .classpath
 .project
+
+/*.sql
