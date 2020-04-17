@@ -92,7 +92,7 @@ public class TkStaticPageWrap extends CObject implements Take {
 			new InputStreamReader(
 					sequencify(streamify("<!DOCTYPE html>\n<html lang=\"" + language + "\"><head>\n\t<meta name=\"pageid\" content=\"" + pagename + "\">\n"),
 							CResources.openBinary("html/head.html").get(),
-							headPrepared.body(), streamify("</head><body onload=\"bodyLoaded()\">\n"),
+							headPrepared.body(), streamify("</head><body>\n"),
 							CResources.openBinary("html/header.html").get(), streamify("<section id=\"page\">"),
 							CResources.openBinary("html/prebody.html").get(), prepared.body(),
 							CResources.openBinary("html/postbody.html").get(), streamify("</section></body></html>")),

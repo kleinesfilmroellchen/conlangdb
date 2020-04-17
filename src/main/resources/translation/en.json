@@ -1,7 +1,9 @@
 {
 	"$schema": "./translation-schema.json",
+
 	"t--true": "Yes",
 	"t--false": "No",
+
 	"t--zero": "zero",
 	"t--one": "one",
 	"t--two": "two",
@@ -13,6 +15,7 @@
 	"t--eight": "eight",
 	"t--nine": "nine",
 	"t--ten": "ten",
+
 	"t--conlangdb": "ConlangDB",
 	"t--home": "Home",
 	"t--languages": "Languages",
@@ -25,21 +28,38 @@
 	"t--license-info": "This project is licensed under the AGPL 2.0 license.",
 	"t--welcomemsg": "Welcome to ConlangDB. Please refer to the help sidebar if you want to know how to use the Web interface. To get started, select a language that you want to work on by opening the &ldquo;Language&rdquo; menu.",
 	"t--conlangs": "Constructed languages",
+
 	"t--statistics": "Statistics",
 	"t--statistic-languages": "<span id=\"language-count\"></span> languages, <span id=\"conlang-count\"></span> constructed languages.",
 	"t--statistic-words": "<span id=\"word-count\"></span> words, <span id=\"word-count-lang1\"></span> in language <span class=\"lang1\"></span> and  <span id=\"word-count-lang2\"></span> in language <span class=\"lang2\"></span>.",
 	"t--statistic-definitions": "<span id=\"definition-count\"></span> definitions, <span id=\"definition-count-lang1\"></span> in language <span class=\"lang1\"></span> and  <span id=\"definition-count-lang2\"></span> in language <span class=\"lang2\"></span>.",
 	"t--statistic-wordattributes": "<span id=\"wordattribute-count\"></span> definitions, <span id=\"wordattribute-count-lang1\"></span> in language <span class=\"lang1\"></span> and  <span id=\"wordattribute-count-lang2\"></span> in language <span class=\"lang2\"></span>.",
+
+	"t--button-edit": "Edit",
+	"t--button-save": "Save",
+
 	"t--language-name": "Name",
 	"t--language-name-en": "Name (English)",
 	"t--language-id": "Language code",
+	"t--language-description": "Description",
+	"t--language-description-en": "Description (English)",
 	"t--isconlang": "Constructed language",
+	"t--fonturl": "Font URL",
 	"t--language-word-count": "Words",
 	"t--language-list-caption": "Table listing all languages in the database.",
+
+	"t--language-not-found": "This language was not found in the database. Create a new language by opening the language list page and clicking  &ldquo;New Page&rdquo;.",
+
+
 	"t--title-mainpage": "Main page",
 	"t--description-mainpage": "Homepage of the ConlangDB web interface. Includes statistics and general information.",
 	"t--helptext-mainpage": "This is the main page. You can find statistics about your database on here. Use the navigation bar on the top to open different subpages and menues. Just click on any one of them to try them out.<br>This help box is available for each and every subpage, and provides helpful information for the page you're currently on. You can click on the &ldquo;Help&rdquo; text up top to close this box, if you don't need it. It will also stay closed between pages.<br>On the very bottom is the page footer, which provides copyright, license and version information.",
+
 	"t--title-languages": "Languages",
 	"t--description-languages": "Language list page, which contains a list of all languages in the database. View all languages in the database and select languages to work with.",
-	"t--helptext-languages": "On this page all languages in your database are listed. You can click on any language to view its details or use the &ldquo;Create Language&rdquo; button to create a new language.<br>Clicking on the column before the language's name will select the language for translation from or to. The current language selected for translating from is marked with a left-pointing arrow, and the current language selected for translating to is marked with a right-pointing arrow. Clicking on an unselected language marks it for translating to and deletes the marking for the current from-language, with the old to-language becoming the new from-language. Clicking one of the selected languages switches their positions."
+	"t--helptext-languages": "On this page all languages in your database are listed. You can click on any language to view its details or use the &ldquo;Create Language&rdquo; button to create a new language.<br>Clicking on the column before the language's name will select the language for translation from or to. The current language selected for translating from is marked with a left-pointing arrow, and the current language selected for translating to is marked with a right-pointing arrow. Clicking on an unselected language marks it for translating to and deletes the marking for the current from-language, with the old to-language becoming the new from-language. Clicking one of the selected languages switches their positions.",
+
+	"t--title-language": "Language",
+	"t--description-language": "Single language view page. View a language's attributes, edit them or delete the language.",
+	"t--helptext-language": "On this page you can view a single language and its attributes or create a new language.<br>Each language has a name, which is the language as it is called in the language itself. This name should be in romanized form, as it is displayed without special fonts everywhere in the interface. The English name is the name of the language as English speakers call it. You can choose to put the language's name in your native/primary language here, if the database users utilize the same language or if you are the only user of the database. The language description and English description are similar. They give an overview of the language, e.g. its geographic location, speaker and speaking population info, general linguistic info, worldbuilding context for artlangs etc. Again, the description should be in the language itself in romanization, while the English description can be in English or your database language.<br>The last couple of properties are a bit special. The language ID is the unique sequence of up to three characters which distinctively identify your language. You should use the real ISO-639 language code such as &ldquo;en&rdquo; or &ldquo;zh&rdquo;, if the language is a real language. This also makes the database recognize it as a non-conlang (see below). Use the two-letter code wherever possible. For Conlangs, use a custom language code in the range qaa-qtz, which is reserved by ISO-639 for &ldquo;private use&rdquo;. The &ldquo;Is a Conlang&rdquo; flag states whether the language is a constructed language or a real language. Whenever the language's ID is changed (which includes language creation), the ID is checked against an online list of all ISO-639 language codes provided by the Library of Congress. If the ID appears in the list, the language is recognized to be a real language and the flag is set to false/No. Because this check occurs on most language modifications, any change to language data may take up to 20 seconds due to the recheck. Consider keeping your language modifications to a minimum.<br>Finally, the Font URL specifies the font file on the server which is to be used to display native text of the language. This allows your to write native text in your conlangs which uses characters from the Private Use Area of Unicode and then create a font which is capable of displaying your characters. As long as the font is placed into the font folder of the server and has a compatible format (OTF and WOFF are recommended, TTF is possible on some systems), the system will use your font for displaying the language's native text. Refer to the installation instructions on where to place your fonts. Note that font variants such as bold or italic are not supported. Most modern browsers will simulate bold and italic font variants to a decent degree of accuracy.<br>To edit the language, click the Edit button. Click the Delete button to delete the language."
 }

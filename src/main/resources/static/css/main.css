@@ -6,9 +6,14 @@
 	/* Define accent colors */
 	--background: white;
 	--foreground: black;
-	--accent-1: #55f162e5;
-	--accent-2: #3bf3e4;
-	--accent-3: #2c6daa;
+	--accent-1-light: #55f162e5;
+	--accent-1-dark: #0b8e16e5;
+	--accent-2-light: #2ff3b2;
+	--accent-2-dark: hsl(160, 89%, 40%);
+	--accent-3-light: #66bffa;
+	--accent-3-dark: #2c6daa;
+	/*General sizings*/
+	--button-border-width: 3px;
 }
 
 /*All the dark theme does is redefine the foreground and background colors.*/
@@ -33,7 +38,7 @@ body {
 	color: var(--foreground);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6, div#language-edit-container > label {
 	font-family: Balthazar, Caveat, 'Noto Sans', cursive;
 	font-size: 140%;
 }
@@ -42,17 +47,16 @@ h2 { font-size: 200%; }
 h3 { font-size: 180%; }
 h4 { font-size: 160%; }
 
-#language-selection {
-	font-size: 85%;
-	break-inside: avoid;
+.hidden {
+	display: none;
 }
 
 a {
-	color: var(--accent-2);
+	color: var(--accent-2-light);
 	text-decoration: none;
 }
 a:visited {
-	color: var(--accent-3);
+	color: var(--accent-2-dark);
 }
 
 /* CSS GRID 4THEWIN! */
@@ -134,7 +138,7 @@ footer {
 
 /* Navigation styles */
 header {
-	background: var(--accent-1);
+	background: var(--accent-1-light);
 	text-align: center;
 	position: fixed;
 	width: 100%;
@@ -187,7 +191,7 @@ nav {
 	text-align: left;
 	top:  100%;
 	left: 0;
-	background: var(--accent-1);
+	background: var(--accent-1-light);
 	width: 100%;
 	transform: scale(1, 0);
 	transform-origin: top;
@@ -247,14 +251,33 @@ tr {
 	padding-top: 0.25rem;
 }
 
-input {
-	color: inherit;
-	background: none;
+#language-selection {
+	font-size: 85%;
+	break-inside: avoid;
+}
+
+div#language-edit-container {
+	display: grid;
+	grid-template-columns: auto;
+	grid-auto-rows: min-content;
+	margin-bottom: 2em;
+}
+div#language-edit-container > * {
+	/*allows each element to take its preferred width*/
+	margin-right: auto;
+	margin-bottom: 0.75em;
+}
+div#language-edit-container > label {
+	margin-bottom: 0.25em;
+}
+input#language-id-edit {
+	width: 3em;
 }
 
 /* Language select button */
-input[type="button"].language-select {
+input[type="button"].language-select, input[type="button"].language-select:hover, input[type="button"].language-select:active {
 	background: none;
+	color: var(--foreground);
 	border: none;
 	padding: 0;
 	margin: 0;
@@ -262,8 +285,72 @@ input[type="button"].language-select {
 	width: 2em;
 	height: 2em;
 }
+input[type="button"].language-select::before {
+	display: none;
+}
+
+/* Form styles */
+
+input, textarea {
+	color: inherit;
+	background: none;
+	outline: none;
+	border-radius: 0;
+	border-color: var(--accent-1-dark);
+	border-style: solid;
+	font: inherit;
+}
+input:not(:read-only):focus, textarea:not(:read-only):focus {
+	outline: var(--foreground) solid 2px;
+	outline-offset: var(--button-border-width);
+}
+
+input[type=button], button {
+	background: none;
+	border: var(--button-border-width) solid var(--accent-3-dark);
+	font: inherit;
+	color: inherit;
+	border-radius: 0;
+	position: relative;
+	margin: 0;
+	padding: 0.8em 2em;
+	font-weight: bold;
+}
+input[type=button]::after, button::after {
+	content: '';
+	display: block;
+	position: absolute;
+	background: var(--accent-3-light);
+	height: 100%;
+	width: 0;
+	left: 0;
+	bottom: 0;
+	top: 0;
+	z-index: -1;
+	transition: width 250ms ease;
+}
+input[type=button]:hover::after, button:hover::after {
+	width: 100%;
+	transition: width 150ms ease;
+}
+input[type=button]:active, button:active {
+	background: var(--accent-3-light);
+}
+
+textarea {
+	width: 100%;
+	resize: vertical;
+	min-height: 3em;
+}
+
+textarea.borderless, input.borderless {
+	border: none;
+	background: none;
+	color: inherit;
+}
 
 /* Large Desktop styles */
+
 @media screen and (min-width: 1100px) {
 	.nav-toggle-label {
 		display: none;

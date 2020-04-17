@@ -6,6 +6,18 @@ The server mostly ignores HTTP headers and methods, unless it is absolutely nece
 
 Cookies are never used. The Web frontend makes use of `window.localStorage` to store session-specific parameters which are of no interest to the server.
 
+Part of the RESTful behavior is that all the information the server has about a client is the data sent with the HTTP request. There is no hidden server-side client data.
+
+## Caching
+
+Static files are allowed to be cached for 20 days, with the additional tag of "immutable" indicating to the cache that the resource will not change. For development purposes, it is best to keep the developer tab open and disable the cache. The static files include the translation endpoints (which are generated only depending on static files).
+
+Computation-intense endpoints are short-cached, i.e. for a time between 10 seconds and a minute. This removes server load for often refreshes but still enables the resource to be updated regularly. These endpoints include the statistics endpoint.
+
+HTML documents are currently not cached. In theory, the individual static page handlers can dynamically add content, although most of the "framework content", metadata and headers are statically fetched from files. The static page handlers are free to implement cache control and cache verification.
+
+As the website appears the same to every user, public caching is enabled.
+
 ## Font handling
 
 Many conlangs will not use any existing script and, therefore, mostly use characters defined in the Private Use Areas of Unicode as custom characters. As these are not printable by any existing font, the user may provide custom fonts where such characters have defined looks. The user can then place these fonts directly into the `res/font` folder, where the server will serve them under the `/font` URLs. The languages have the column `FontUrl` which specifies the language's font location relative to the `/font` folder.
@@ -30,7 +42,17 @@ This endpoint serves a front page that includes some basic statistics fetched fr
 
 This endpoint serves a page which will fetch and display the language list provided on the exact same endpoint (see below) using its own query parameters.
 
+### `/language/LANG` with `Accept: text/html`: Language detail view
+
+This endpoint serves a page which displays the full detail information for the language with ID "LANG" with the option for the user to edit or delete the language.
+
+If the `action=create` query parameter is set, no language data is fetched. An empty form is displayed that allows the user to create a new language.
+
+All of the "form actions" on the page invoke the same path of the current page with different methods such as POST and DELETE (documented below). An exception is the language creation page variation, which determines the language identifier from user input.
+
 ## API
+
+APIs generally communicate over JSON or query parameters in the case of GET requests.
 
 ### `/translation/xx_XX`: Translation lists
 
@@ -76,6 +98,24 @@ Allowed `fields` values:
 
 - `text`: Actual text of the word in native script (this may not be printable!). As word texts need to be unique, the APIs cannot access the database's word IDs.
 - `romanized`: Romanized version of the word. This text should only contain Latin characters (diacritics included, which will be a necessity for many romanizations) and basic (preferrably ASCII) punctuation. It is recommended to use a consistent romanization, especially if there are multiple different ways to romanize words.
+
+### `/language/LANG`: Language access
+
+This API allows for retrieving (GET), manipulating or creating (POST) and deleting (DELETE) single languages. The language is identified with the ID "LANG". 404 is used for all nonexistent languages that are attempted to be GET'd or DELETE'd.
+
+## GET with `Accept: application/json`
+
+Retrieves all data for a single language as a JSON object. (key list to be inserted here)
+
+## POST
+
+Change or create a language's data. The request body is a JSON object that indicates all the language data to be changed. The keys are identical with the ones returned by GET. The only special key that can be used is the "id" key, which will change the language's ID to the new given ID.
+
+The answer by the server is a 200 for a language change and 201 (Created) for language creation. The answer body contains all the language information as with a GET request. The Location header is set to the language's path, which may be equal to the path that the POST request was made on (and will always be for newly created languages). It will be changed if through an "id" key in the request body, the language's ID was changed and it is therefore now available on a new, different path. The client can therefore simply GET the Location URL.
+
+## DELETE
+
+Delete a language. The answer is 200 and the answer body contains all the language information as with a GET request
 
 ### `/word/LANG/TEXT`: Single word access
 

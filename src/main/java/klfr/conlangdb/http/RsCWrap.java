@@ -11,7 +11,7 @@ import klfr.conlangdb.CObject;
 
 /**
  * Response wrapper for the ConlangDB server responses. This composes a couple
- * of responses into a single decorator.
+ * of responses into a single decorator. A content-length header is NOT added.
  */
 public class RsCWrap extends CObject implements Response {
 	private static final Logger log = Logger.getLogger(RsCWrap.class.getCanonicalName());

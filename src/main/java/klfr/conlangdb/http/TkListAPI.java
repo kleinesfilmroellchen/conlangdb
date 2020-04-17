@@ -331,10 +331,9 @@ public class TkListAPI implements Take {
 						properOrdering, order.sql,
 						(limit >= 0 ? (" LIMIT " + limit) : "") + (offset >= 0 ? (" OFFSET " + offset) : ""));
 			}
-			return String.format(
-					"SELECT %s, (select Native from TWord translation "+
-					"join RelTranslation on (translation.ID=RelTranslation.WIDOne or translation.ID=RelTranslation.WIDTwo) where (TWord.ID=RelTranslation.WIDOne or TWord.ID=RelTranslation.WIDTwo) ) "+
-					"FROM TWord ORDER BY %s %s %s;",
+			return String.format("SELECT %s, (select Native from TWord translation "
+					+ "join RelTranslation on (translation.ID=RelTranslation.WIDOne or translation.ID=RelTranslation.WIDTwo) where (TWord.ID=RelTranslation.WIDOne or TWord.ID=RelTranslation.WIDTwo) ) "
+					+ "FROM TWord ORDER BY %s %s %s;",
 					String.join(", ",
 							fields.stream().map(fieldMapper).filter(x -> x != null).collect(Collectors.toSet())),
 					properOrdering, order.sql,

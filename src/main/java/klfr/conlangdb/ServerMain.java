@@ -10,6 +10,7 @@ import org.takes.facets.fallback.Fallback;
 import org.takes.facets.fallback.FbChain;
 import org.takes.facets.fallback.RqFallback;
 import org.takes.facets.fallback.TkFallback;
+import org.takes.facets.fork.FkMethods;
 import org.takes.facets.fork.FkRegex;
 import org.takes.facets.fork.FkTypes;
 import org.takes.facets.fork.TkFork;
@@ -26,6 +27,8 @@ import org.takes.tk.TkWithType;
 import klfr.conlangdb.http.FbFail;
 import klfr.conlangdb.http.HttpStatusCode;
 import klfr.conlangdb.http.TkFilesAdvanced;
+import klfr.conlangdb.http.TkLanguageAPI;
+import klfr.conlangdb.http.TkLanguageListPage;
 import klfr.conlangdb.http.TkLanguagePage;
 import klfr.conlangdb.http.TkListAPI;
 import klfr.conlangdb.http.TkLog;
@@ -104,10 +107,22 @@ public class ServerMain extends CObject {
 					// Language list page/api
 					new FkRegex(Pattern.quote("/language/list"), new TkFork(
 							new FkTypes("text/html",
-									new TkStaticPageWrap(new TkLanguagePage(), new TkLanguagePage.Header(),
+									new TkStaticPageWrap(new TkLanguageListPage(), new TkLanguageListPage.Header(),
 											"languages")),
 							new FkTypes("application/json",
 									new TkListAPI(TkListAPI.languageQueryBuilder, List.of("id", "name"), "id")))),
+					// Single language page/api
+					new FkRegex(
+							TkLanguageAPI.languageAPIPattern,
+							new TkFork(
+									new FkMethods("GET",
+											new TkFork(
+													new FkTypes("text/html",
+															new TkStaticPageWrap(new TkLanguagePage(), new TkLanguagePage.Headers(), "language")),
+													new FkTypes("application/json", new TkLanguageAPI.Get()))),
+									new FkMethods("POST", new TkLanguageAPI.Post()),
+									new FkMethods("DELETE", new TkLanguageAPI.Delete()))),
+					// Word list page/api (WIP)
 					new FkRegex(Pattern.quote("/word/list"),
 							new TkFork(new FkTypes("text/html", new TkStaticPageWrap(new TkEmpty(), "words")),
 									new FkTypes("application/json",
@@ -117,7 +132,7 @@ public class ServerMain extends CObject {
 					new FkRegex("\\/translation\\/([a-z]{2,3})(?:\\_([A-Z]{2,3}))?", new TkTranslations()),
 					// Statistics
 					new FkRegex(Pattern.quote("/statistics"), new TkStatistics())),
-					// Fallback for handling server errors and error codes
+					//// Fallback for handling server errors and error codes
 					new FbChain(new FbFail(HttpStatusCode.NOT_FOUND), new FbFail(HttpStatusCode.METHOD_UNALLOWED),
 							new FbFail(HttpStatusCode.BAD_REQUEST), new FbFail(HttpStatusCode.INTERNAL_SERVER_ERROR),
 							new Fallback() {

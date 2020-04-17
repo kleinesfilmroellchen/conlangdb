@@ -1,5 +1,5 @@
 // language-list.js: JavaScript handling language list page logic.
-loadEvents.push(() => {
+window.addEventListener('DOMContentLoaded', () => {
 	const params = window.location.search.length > 0 ? new URLSearchParams(window.location.search) : new URLSearchParams("?fields=name-en,isconlang&order=name asc&ipp=200");
 	const rowTemplate = document.querySelector("template#language-row");
 	const tbody = document.querySelector("table#language-list tbody");

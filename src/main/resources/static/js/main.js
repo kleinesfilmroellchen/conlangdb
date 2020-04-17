@@ -1,4 +1,9 @@
 // main.js: Master JavaScript
+
+// minimized simple mutex implementation
+class Mutex { constructor() { this.b = !1, this.q = [] } synchronize(t) { const s = this; return new Promise(function (n, h) { s.q.push([t, n, h]), s.b || s.d() }) } d() { this.b = !0; const t = this.q.shift(); t ? this.e(t) : this.b = !1 } e(t) { const [s, n, h] = t, i = this; s().then(n, h).then(function () { i.d() }) } }
+
+
 const pagename = document.querySelector('meta[name="pageid"]').content;
 console.log(pagename);
 
@@ -8,17 +13,26 @@ async function getPageTranslation() {
 	const language = new URLSearchParams(window.location.search).get("lang") || navigator.language.replace("-", "_");
 	console.info("Language", language);
 	// The server adds all the English texts where the actual translation file has no text translated.
-	return fetch(`/translation/${language}`).then(result => result.json()).catch(() => fetch(`/translation/en`));
+	return fetch(`/translation/${language}`).then(result => result.json()).catch(() => fetch(`/translation/en`).then(result => result.json()));
 }
 
-// Triggered on body load by the onload HTML attribute
-function bodyLoaded() {
-	loadEvents.forEach(evt => evt());
-}
+const getLanguageName = (() => {
+	const languages = new Map();
+	const langMx = new Mutex();
+	return async langId => langMx.synchronize(async () => {
+		console.log(languages, langId, languages.has(langId));
+		if (languages.has(langId)) return languages.get(langId);
+		const langData = await fetch(`/language/${langId}`, { headers: new Headers({ "Accept": "application/json" }) })
+			.then(res => res.ok ? res.json() : Promise.reject())
+			.catch(reason => { console.log(reason); return { name: 'Unknown' }; });
+		languages.set(langId, langData.name);
+		console.log(languages);
 
+		return langData.name;
+	});
+})();
 
-const loadEvents = [];
-loadEvents.push(() => {
+window.addEventListener('DOMContentLoaded', () => {
 	// set the help section visibility
 	document.querySelector("#help-toggle").checked = window.localStorage.helpOpen === "false";
 
@@ -51,11 +65,11 @@ loadEvents.push(() => {
 			langselectLi.innerHTML = translations["t--no-lang-selected"];
 		} else {
 			const langselectContent = document.querySelector("#language-selection-template").content.cloneNode(true);
-			// TODO: needs to access language table via API to find human-readable name of language.
-			langselectContent.querySelector("#language-from").innerHTML = languageFrom;
-			langselectContent.querySelector("#language-to").innerHTML = languageTo;
-			console.log(langselectContent);
 			langselectLi.appendChild(langselectContent);
+			langselectLi.querySelector("a#language-from").href = `/language/${languageFrom}`;
+			langselectLi.querySelector("a#language-to").href = `/language/${languageTo}`;
+			getLanguageName(languageFrom).then(langname => langselectLi.querySelector("#language-from").innerHTML = langname);
+			getLanguageName(languageTo).then(langname => langselectLi.querySelector("#language-to").innerHTML = langname);
 		}
 
 		// Help text
@@ -91,8 +105,8 @@ function requestStatistics() {
 		}
 
 		// replace placeholder span content
-		container.querySelectorAll(".lang1").forEach(elt => elt.innerHTML = window.localStorage.languageFrom);
-		container.querySelectorAll(".lang2").forEach(elt => elt.innerHTML = window.localStorage.languageTo);
+		container.querySelectorAll(".lang1").forEach(elt => getLanguageName(window.localStorage.languageFrom).then(langname => elt.innerHTML = langname));
+		container.querySelectorAll(".lang2").forEach(elt => getLanguageName(window.localStorage.languageTo).then(langname => elt.innerHTML = langname));
 		for (const countkey of ["language", "word", "definition", "wordattribute"].map(x => `${x}-count`)) {
 			container.querySelectorAll(`#${countkey}`).forEach(elt => elt.innerHTML = statistics[`${countkey}`].all);
 			container.querySelectorAll(`#${countkey}-lang1`).forEach(elt => elt.innerHTML = statistics[`${countkey}`][window.localStorage.languageFrom]);
