@@ -6,9 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.DateTimeException;
 import java.time.Instant;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -104,6 +102,8 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 	 */
 	public static <U> DatabaseCommand<U> from(final Function<Connection, Optional<U>> toExecute) {
 		return new NoArgumentCmd<U>(toExecute) {
+			private static final long serialVersionUID = -8785363225098048576L;
+
 			public String getReadableName() {
 				return "SimpleExternalCmd";
 			}
@@ -196,6 +196,7 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 	 * @param <U> the type of arguments to return
 	 * @return an iterator of the arguments of the given types, in correct order.
 	 */
+	@SuppressWarnings("unchecked")
 	public <U> Stream<U> onlyArguments(final Class<U> clazz) {
 		return getArguments().filter(arg -> clazz.isInstance(arg)).map(arg -> (U) arg);
 	}
@@ -596,6 +597,7 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		public <T> Optional<T> getArgument(final int index) {
 			return index == 0 ? (Optional<T>) Optional.of(requested) : Optional.empty();
 		}
@@ -712,11 +714,13 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		public <T> Optional<T> getArgument(final int index) {
 			return index == 0 ? (Optional<T>) Optional.of(sql) : Optional.empty();
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		public <T> Stream<T> onlyArguments(final Class<T> clazz) {
 			return clazz.isInstance(sql) ? Stream.<T>of((T) sql) : Stream.empty();
 		}

@@ -1,7 +1,5 @@
 package klfr.conlangdb.http;
 
-import static klfr.conlangdb.http.RsUnicodeText.streamify;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -13,6 +11,7 @@ import org.takes.rs.RsSimple;
 
 import klfr.conlangdb.CObject;
 import klfr.conlangdb.CResources;
+import klfr.conlangdb.util.StringStreamUtil;
 
 /**
  * HTML page for the single language page. Responds to the action=create query
@@ -39,7 +38,8 @@ public class TkLanguagePage extends CObject implements Take {
 
 		@Override
 		public Response act(Request req) {
-			return new RsSimple(List.of(), streamify("<script src=\"/js/language-action.js\"></script>"));
+			return new RsSimple(List.of(),
+					StringStreamUtil.streamify("<script src=\"/js/language-action.js\"></script>"));
 		}
 
 		@Override

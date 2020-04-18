@@ -86,6 +86,7 @@ public class DatabaseCommunicator extends CObject {
 	 * command submitter with retry count that limits how often commands are
 	 * re-submitted
 	 */
+	@SuppressWarnings("unchecked")
 	private static synchronized <T extends Object> Future<Optional<T>> submitCommand(DatabaseCommand<T> cmd, int retryCount) {
 		try {
 			queue.put((DatabaseCommand<Object>) cmd);

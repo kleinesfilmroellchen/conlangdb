@@ -3,15 +3,17 @@ package klfr.conlangdb.http;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.takes.*;
-import org.takes.rs.*;
+import org.takes.Response;
+import org.takes.facets.fallback.Fallback;
+import org.takes.facets.fallback.RqFallback;
+import org.takes.misc.Opt;
+import org.takes.rs.RsText;
+import org.takes.rs.RsWithStatus;
 
 import klfr.conlangdb.CObject;
 
-import org.takes.facets.fallback.*;
-import org.takes.misc.Opt;
-
 public class FbFail extends CObject implements Fallback {
+	private static final long serialVersionUID = 1L;
 
 	public final HttpStatusCode code;
 

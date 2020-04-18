@@ -1,12 +1,12 @@
 package klfr.conlangdb.http;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import org.takes.Response;
+
+import klfr.conlangdb.util.StringStreamUtil;
 
 /**
  * Basic response that will create a response only with a body containing the
@@ -35,18 +35,11 @@ public class RsUnicodeText implements Response {
 	 */
 	@Override
 	public Iterable<String> head() throws IOException {
-		return List.of("Content-Length: " + Integer.toString(body.getBytes(Charset.forName("utf-8")).length));
+		return List.of("Content-Length: " + Integer.toString(StringStreamUtil.contentLength(body)));
 	}
 
 	@Override
 	public InputStream body() throws IOException {
-		return streamify(body);
-	}
-
-	/**
-	 * Makes a UTF-8 encoded input stream from the string.
-	 */
-	public static InputStream streamify(final String s) {
-		return new ByteArrayInputStream(s.getBytes(Charset.forName("utf-8")));
+		return StringStreamUtil.streamify(body);
 	}
 }

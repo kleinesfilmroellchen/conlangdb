@@ -37,6 +37,8 @@
 
 	"t--button-edit": "Edit",
 	"t--button-save": "Save",
+	"t--button-end-edit": "End editing",
+	"t--button-save-progress": "Saving...",
 
 	"t--language-name": "Name",
 	"t--language-name-en": "Name (English)",
@@ -47,8 +49,9 @@
 	"t--fonturl": "Font URL",
 	"t--language-word-count": "Words",
 	"t--language-list-caption": "Table listing all languages in the database.",
+	"t--button-create-language": "New Language",
 
-	"t--language-not-found": "This language was not found in the database. Create a new language by opening the language list page and clicking  &ldquo;New Page&rdquo;.",
+	"t--language-not-found": "This language was not found in the database. Create a new language by opening the language list page and clicking  &ldquo;New Language&rdquo;.",
 
 
 	"t--title-mainpage": "Main page",

@@ -1,14 +1,14 @@
 package klfr.conlangdb.http;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.takes.Response;
+
+import klfr.conlangdb.util.StringStreamUtil;
 
 /**
  * A simple response that uses JSON data as its body. Appropriately, the
@@ -75,19 +75,12 @@ public class RsJSON implements Response {
 	@Override
 	public Iterable<String> head() throws IOException {
 		return List.of("Content-Type: application/json; charset=UTF-8",
-				"Content-Length: " + Integer.toString(json.getBytes(Charset.forName("utf-8")).length));
+				"Content-Length: " + Integer.toString(StringStreamUtil.contentLength(json)));
 	}
 
 	@Override
 	public InputStream body() throws IOException {
-		return streamify(json);
-	}
-
-	/**
-	 * Makes a UTF-8 encoded input stream from the string.
-	 */
-	public static InputStream streamify(final String s) {
-		return new ByteArrayInputStream(s.getBytes(Charset.forName("utf-8")));
+		return StringStreamUtil.streamify(json);
 	}
 
 }

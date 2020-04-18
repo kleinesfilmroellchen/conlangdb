@@ -2,9 +2,6 @@ package klfr.conlangdb.http;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -27,7 +24,6 @@ import org.takes.rs.RsWithHeaders;
 
 import klfr.conlangdb.CObject;
 import klfr.conlangdb.CResources;
-import static klfr.conlangdb.http.RsUnicodeText.streamify;
 
 /**
  * Advanced static file server that extends TkFiles' behavior. This file take
@@ -38,10 +34,14 @@ import static klfr.conlangdb.http.RsUnicodeText.streamify;
  * strategies. For one, public caching of the files is allowed for up to 20
  * days. Second, a Last-Modified header contains the time of last file change as
  * recorded by the operating system. This feature only works on non-JAR
- * resources. 
+ * resources.
  */
 public class TkFilesAdvanced extends CObject implements Take {
-	//Third, an If-Modified-Since header is honored by returning an empty 304 (Not Modified) response if the last modification time was earlier than the given time.
+	// Third, an If-Modified-Since header is honored by returning an empty 304 (Not
+	// Modified) response if the last modification time was earlier than the given
+	// time.
+
+	private static final long serialVersionUID = 1L;
 
 	private static final Logger log = Logger.getLogger(TkFilesAdvanced.class.getCanonicalName());
 

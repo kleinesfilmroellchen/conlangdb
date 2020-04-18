@@ -1,16 +1,13 @@
 package klfr.conlangdb.http;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.Arrays;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,12 +16,10 @@ import org.takes.Response;
 import org.takes.Take;
 import org.takes.rq.RqHref;
 import org.takes.rs.RsEmpty;
-import org.takes.rs.RsWithBody;
 import org.takes.rs.RsWithHeader;
 
+import klfr.conlangdb.database.DatabaseCommand.StatisticsCmd;
 import klfr.conlangdb.database.DatabaseCommunicator;
-
-import static klfr.conlangdb.database.DatabaseCommand.StatisticsCmd;
 
 public class TkStatistics implements Take {
 

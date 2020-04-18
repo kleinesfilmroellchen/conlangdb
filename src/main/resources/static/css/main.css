@@ -48,7 +48,7 @@ h3 { font-size: 180%; }
 h4 { font-size: 160%; }
 
 .hidden {
-	display: none;
+	display: none !important;
 }
 
 a {
@@ -306,6 +306,20 @@ input:not(:read-only):focus, textarea:not(:read-only):focus {
 	outline-offset: var(--button-border-width);
 }
 
+textarea {
+	width: 100%;
+	resize: vertical;
+	min-height: 3em;
+}
+
+textarea.borderless, input.borderless {
+	border: none;
+	background: none;
+	color: inherit;
+}
+
+/* Buttons */
+
 input[type=button], button {
 	background: none;
 	border: var(--button-border-width) solid var(--accent-3-dark);
@@ -338,17 +352,36 @@ input[type=button]:active, button:active {
 	background: var(--accent-3-light);
 }
 
-textarea {
-	width: 100%;
-	resize: vertical;
-	min-height: 3em;
+input[type=button]:disabled, button:disabled {
+	opacity: 50%;
 }
 
-textarea.borderless, input.borderless {
-	border: none;
-	background: none;
-	color: inherit;
+/* The progress animation makes the element slide across its container horizontally
+ while increasing and decreasing in size. */
+@keyframes button-progress {
+	0% {
+		animation-timing-function: ease-in;
+		width: 0;
+		left: 0;
+	}
+	50% {
+		animation-timing-function: ease-out;
+		left: 0;
+		width: 100%;
+	}
+	100% {
+		width: 0;
+		left: 100%;
+	}
 }
+
+input[type=button].progress::after, button.progress::after {
+	transition: none;
+	animation-name: button-progress;
+	animation-duration: 1.5s;
+	animation-iteration-count: infinite;
+}
+
 
 /* Large Desktop styles */
 

@@ -1,22 +1,21 @@
 package klfr.conlangdb.http;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
-import org.takes.*;
-import org.takes.rs.*;
+import org.takes.Request;
+import org.takes.Response;
+import org.takes.Take;
+import org.takes.rq.RqRequestLine;
+import org.takes.rq.RqSocket;
 
 import klfr.conlangdb.CObject;
-
-import org.takes.rq.*;
 
 /**
  * Take decorator that logs all requests to the Java logging system.
  */
 public class TkLog extends CObject implements Take {
+	private static final long serialVersionUID = 1L;
 
 	private static final Logger log = Logger.getLogger(TkLog.class.getPackageName());
 

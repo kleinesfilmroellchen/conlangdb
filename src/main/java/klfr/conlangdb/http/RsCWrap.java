@@ -2,10 +2,11 @@ package klfr.conlangdb.http;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Logger;
 
-import org.takes.*;
-import org.takes.rs.*;
+import org.takes.Response;
+import org.takes.rs.RsText;
+import org.takes.rs.RsWithHeader;
+import org.takes.rs.RsWithStatus;
 
 import klfr.conlangdb.CObject;
 
@@ -14,7 +15,7 @@ import klfr.conlangdb.CObject;
  * of responses into a single decorator. A content-length header is NOT added.
  */
 public class RsCWrap extends CObject implements Response {
-	private static final Logger log = Logger.getLogger(RsCWrap.class.getCanonicalName());
+	private static final long serialVersionUID = 1L;
 
 	private final Response res;
 
@@ -36,6 +37,7 @@ public class RsCWrap extends CObject implements Response {
 
 	/**
 	 * Simple response with only status code and no body.
+	 * 
 	 * @param status
 	 */
 	public RsCWrap(HttpStatusCode status) {

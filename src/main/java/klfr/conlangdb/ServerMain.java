@@ -1,6 +1,5 @@
 package klfr.conlangdb;
 
-import java.io.File;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -20,9 +19,6 @@ import org.takes.http.Exit;
 import org.takes.http.FtBasic;
 import org.takes.rs.RsHtml;
 import org.takes.tk.TkEmpty;
-import org.takes.tk.TkFiles;
-import org.takes.tk.TkWithHeaders;
-import org.takes.tk.TkWithType;
 
 import klfr.conlangdb.http.FbFail;
 import klfr.conlangdb.http.HttpStatusCode;
@@ -118,7 +114,8 @@ public class ServerMain extends CObject {
 									new FkMethods("GET",
 											new TkFork(
 													new FkTypes("text/html",
-															new TkStaticPageWrap(new TkLanguagePage(), new TkLanguagePage.Headers(), "language")),
+															new TkStaticPageWrap(new TkLanguagePage(),
+																	new TkLanguagePage.Headers(), "language")),
 													new FkTypes("application/json", new TkLanguageAPI.Get()))),
 									new FkMethods("POST", new TkLanguageAPI.Post()),
 									new FkMethods("DELETE", new TkLanguageAPI.Delete()))),

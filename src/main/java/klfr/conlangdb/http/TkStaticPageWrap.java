@@ -2,15 +2,9 @@ package klfr.conlangdb.http;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -24,7 +18,7 @@ import org.takes.rs.RsWithType;
 
 import klfr.conlangdb.CObject;
 import klfr.conlangdb.CResources;
-import static klfr.conlangdb.http.RsUnicodeText.streamify;
+import klfr.conlangdb.util.StringStreamUtil;
 
 /**
  * Wrapper for adding standard HTML head with frontend scripting as well as body
@@ -33,7 +27,7 @@ import static klfr.conlangdb.http.RsUnicodeText.streamify;
 public class TkStaticPageWrap extends CObject implements Take {
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger log = Logger.getLogger(TkStaticPageWrap.class.getCanonicalName());
+	public static final Logger log = Logger.getLogger(TkStaticPageWrap.class.getCanonicalName());
 
 	private final Take sub;
 	private final Optional<Take> headsub;
@@ -88,79 +82,22 @@ public class TkStaticPageWrap extends CObject implements Take {
 					.stream().map(s -> s.split("\\;")[0]).findFirst().orElse("en");
 			log.fine("language " + language);
 
-			var w = new StringWriter();
-			new InputStreamReader(
-					sequencify(streamify("<!DOCTYPE html>\n<html lang=\"" + language + "\"><head>\n\t<meta name=\"pageid\" content=\"" + pagename + "\">\n"),
-							CResources.openBinary("html/head.html").get(),
-							headPrepared.body(), streamify("</head><body>\n"),
-							CResources.openBinary("html/header.html").get(), streamify("<section id=\"page\">"),
-							CResources.openBinary("html/prebody.html").get(), prepared.body(),
-							CResources.openBinary("html/postbody.html").get(), streamify("</section></body></html>")),
-					Charset.forName("utf-8")).transferTo(w);
-			var body = w.toString();
+			var body = StringStreamUtil.stringify(StringStreamUtil.sequencify(
+					StringStreamUtil.streamify("<!DOCTYPE html>\n<html lang=\"" + language
+							+ "\"><head>\n\t<meta name=\"pageid\" content=\"" + pagename + "\">\n"),
+					CResources.openBinary("html/head.html").get(), headPrepared.body(),
+					StringStreamUtil.streamify("</head><body>\n"), CResources.openBinary("html/header.html").get(),
+					StringStreamUtil.streamify("<section id=\"page\">"),
+					CResources.openBinary("html/prebody.html").get(), prepared.body(),
+					CResources.openBinary("html/postbody.html").get(),
+					StringStreamUtil.streamify("</section></body></html>")));
 			log.finer(body);
 			return new RsGzip(new RsWithHeaders(
 					new RsWithType(new RsCWrap(new RsUnicodeText(body)), "text/html", Charset.forName("utf-8")),
-					sequencify(prepared.head(), headPrepared.head())));
+					StringStreamUtil.sequencify(prepared.head(), headPrepared.head())));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	public static InputStream sequencify(final InputStream... streams) {
-		return new SequenceInputStream(new Enumeration<InputStream>() {
-			private int i = 0;
-
-			@Override
-			public boolean hasMoreElements() {
-				return i < streams.length;
-			}
-
-			@Override
-			public InputStream nextElement() {
-				return streams[i++];
-			}
-		});
-	}
-
-	public static <T> Iterable<T> sequencify(final Iterable<T>... iterables) {
-		return new Iterable<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return new Iterator<T>() {
-					private int i = 0;
-					private Iterator<T> currentIterator = iterables[i].iterator();
-
-					@Override
-					public boolean hasNext() {
-						if (currentIterator.hasNext())
-							return true;
-						while (!currentIterator.hasNext() && i < iterables.length - 1) {
-							currentIterator = iterables[++i].iterator();
-							if (currentIterator.hasNext())
-								return true;
-						}
-						return false;
-					}
-
-					@Override
-					public T next() {
-						log.fine("sequence iterator %d of %d: %s. hasnext=%s".formatted(i, iterables.length - 1,
-								currentIterator, currentIterator.hasNext()));
-						if (currentIterator.hasNext()) {
-							log.fine("normal next");
-							return currentIterator.next();
-						}
-						log.fine("proceed to another iterator and try again");
-						if (i >= iterables.length - 1)
-							throw new NoSuchElementException();
-						currentIterator = iterables[++i].iterator();
-						return next();
-					}
-
-				};
-			}
-		};
 	}
 
 	@Override

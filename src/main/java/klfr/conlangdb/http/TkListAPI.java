@@ -1,16 +1,13 @@
 package klfr.conlangdb.http;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -29,12 +26,10 @@ import org.takes.Take;
 import org.takes.rq.RqHref;
 import org.takes.rs.RsEmpty;
 import org.takes.rs.RsWithHeader;
-import org.takes.rs.RsWithType;
 
 import klfr.conlangdb.database.DatabaseCommand;
 import klfr.conlangdb.database.DatabaseCommunicator;
 import klfr.conlangdb.database.SortOrder;
-import klfr.conlangdb.http.TkListAPI.QueryBuilder;
 
 /**
  * An API template which outputs a data list in JSON format to the requestor.

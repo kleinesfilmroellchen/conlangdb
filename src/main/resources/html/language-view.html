@@ -1,8 +1,8 @@
 <!-- Language view page, from language-view.html -->
 <main>
-	<h2 class="language-name"></h2>
-	<p class="t--language-not-found hidden" id="lang-not-found-alert"></p>
-	<div id="language-edit-container">
+	<h2 class="language-name language-edit"></h2>
+	<p class="t--language-not-found hidden" id="language-not-found-alert"></p>
+	<div id="language-edit-container" class="language-edit">
 		<!-- name is the key in the JSON object. id identifies the input for labels. class identifies element groups, e.g. the "only edit" elements -->
 		<input type="text" name="name" id="language-name-edit" class="borderless only-edit language-name">
 
@@ -23,7 +23,7 @@
 		<label for="language-fonturl-edit" class="only-edit t--fonturl"></label>
 		<input type="text" name="fonturl" id="language-fonturl-edit" class="only-edit">
 	</div>
-	<button type="button" class="t--button-edit" id="button-edit"></button>
-	<button type="button" class="t--button-save hidden" id="button-save"></button>
+	<button type="button" class="t--button-edit language-edit" id="button-edit"></button>
+	<button type="button" class="t--button-save hidden language-edit" id="button-save"></button>
 </main>
 <!-- End of language-view.html -->

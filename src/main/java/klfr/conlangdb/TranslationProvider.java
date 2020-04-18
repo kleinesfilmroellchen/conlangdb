@@ -1,11 +1,12 @@
 package klfr.conlangdb;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.json.*;
+import org.json.JSONObject;
 
 /**
  * Handles putting together a translation dictionary that covers both fallback
@@ -34,7 +35,7 @@ public class TranslationProvider extends CObject {
 	 * Simple hashable immutable class that holds information about a language and
 	 * possibly a region.
 	 */
-	private static class TranslationLocale extends CObject {
+	private static class TranslationLocale extends CObject implements Comparable<TranslationLocale> {
 		private static final long serialVersionUID = 1L;
 		private final String language;
 		private final Optional<String> region;
@@ -42,14 +43,6 @@ public class TranslationProvider extends CObject {
 		public TranslationLocale(String language, Optional<String> region) {
 			this.language = language.toLowerCase();
 			this.region = region;
-		}
-
-		public TranslationLocale(String language) {
-			this(language, Optional.empty());
-		}
-
-		public TranslationLocale(String language, String region) {
-			this(language, Optional.ofNullable(region));
 		}
 
 		public String toString() {
@@ -73,6 +66,23 @@ public class TranslationProvider extends CObject {
 		@Override
 		public CObject clone() {
 			return new TranslationLocale(language, region);
+		}
+
+		@Override
+		public int compareTo(TranslationLocale o) {
+			final var compareLang = this.language.compareTo(o.language);
+			if (compareLang == 0) {
+				// if languages are equal, compare regions
+				return this.region.isPresent() ? (o.region.isPresent() ?
+				// compare regions if both are present
+						this.region.get().compareTo(o.region.get()) :
+						// only we have region, other is greater
+						-1) : (
+				// only other has region, we are greater, otherwise both have no region and we
+				// are equal
+				o.region.isPresent() ? 1 : 0);
+			}
+			return compareLang;
 		}
 	}
 
@@ -122,11 +132,10 @@ public class TranslationProvider extends CObject {
 	public static JSONObject getTranslation(String language, Optional<String> region) {
 		var tl = new TranslationLocale(language, region);
 		//// Search for a translation in the map
-		// TODO: re-enable for non-debugging runs
-		// if (translations.containsKey(tl)) {
-		// 	log.fine(f("Translation found for %s", tl));
-		// 	return translations.get(tl);
-		// }
+		if (translations.containsKey(tl)) {
+			log.fine(f("Translation found for %s", tl));
+			return translations.get(tl);
+		}
 
 		//// Otherwise, generate the translation for the locale
 		log.info(f("Generating translation for %s...", tl));
