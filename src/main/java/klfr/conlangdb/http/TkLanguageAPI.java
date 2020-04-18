@@ -53,8 +53,8 @@ public final class TkLanguageAPI {
 						// create result object
 						final var obj = new JSONObject();
 						for (var key : List.of("id", "name", "name-en", "description", "description-en", "fonturl"))
-							obj.put(key, rset.getString(key));
-						obj.put("isconlang", rset.getBoolean("isconlang"));
+							obj.put(key, Just(rset.getString(key)).orElse(""));
+						obj.put("isconlang", Just(rset.getBoolean("isconlang")).orElse(false));
 						rset.close();
 						return Just(obj);
 					} catch (SQLException e) {

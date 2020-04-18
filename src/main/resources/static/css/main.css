@@ -275,10 +275,11 @@ input#language-id-edit {
 }
 
 /* Language select button */
-input[type="button"].language-select, input[type="button"].language-select:hover, input[type="button"].language-select:active {
+input[type="button"].language-select, input[type="button"].language-select:hover, input[type="button"].language-select:active, input[type="button"].language-select:focus {
 	background: none;
 	color: var(--foreground);
 	border: none;
+	outline: none;
 	padding: 0;
 	margin: 0;
 	font-size: 110%;

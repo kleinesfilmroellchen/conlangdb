@@ -28,7 +28,7 @@ public class TranslationProvider extends CObject {
 	 * once created.
 	 */
 	private static final Map<TranslationLocale, JSONObject> translations = new ConcurrentHashMap<TranslationLocale, JSONObject>(
-			10, 0.9f);
+			5, 0.6f);
 
 	/**
 	 * Simple hashable immutable class that holds information about a language and

@@ -10,7 +10,7 @@ console.log(pagename);
 const translationPromise = getPageTranslation();
 
 async function getPageTranslation() {
-	const language = new URLSearchParams(window.location.search).get("lang") || navigator.language.replace("-", "_");
+	const language = window.localStorage.userLanguage || navigator.language.replace("-", "_");
 	console.info("Language", language);
 	// The server adds all the English texts where the actual translation file has no text translated.
 	return fetch(`/translation/${language}`).then(result => result.json()).catch(() => fetch(`/translation/en`).then(result => result.json()));
@@ -20,13 +20,11 @@ const getLanguageName = (() => {
 	const languages = new Map();
 	const langMx = new Mutex();
 	return async langId => langMx.synchronize(async () => {
-		console.log(languages, langId, languages.has(langId));
 		if (languages.has(langId)) return languages.get(langId);
 		const langData = await fetch(`/language/${langId}`, { headers: new Headers({ "Accept": "application/json" }) })
 			.then(res => res.ok ? res.json() : Promise.reject())
 			.catch(reason => { console.log(reason); return { name: 'Unknown' }; });
 		languages.set(langId, langData.name);
-		console.log(languages);
 
 		return langData.name;
 	});
