@@ -97,8 +97,10 @@ class DatabaseManagerThread extends Thread {
 					// blocks while queue is empty
 					nextCommand = commandQueue.take();
 					log.fine(f("RUN COMMAND %s", String.valueOf(nextCommand)));
+					databaseConnection.beginRequest();
 					final var executable = nextCommand.getTask(databaseConnection);
 					executable.run();
+					databaseConnection.endRequest();
 					if (executable.isDone() && !executable.isCancelled())
 						try {
 							executable.get();

@@ -1,11 +1,25 @@
 <!-- Language list page, from language-list.html -->
 <main>
 	<h1 class="t--languages"></h1>
+
+	<section id="new-language">
+		<label for="new-language-dialog-open">
+			<button class="t--new-language" onclick="event.path[1].click()"></button>
+		</label>
+		<input type="checkbox" name="new-language" id="new-language-dialog-open" class="hidden">
+		<div id="new-language-dialog">
+			<label for="new-language-name" class="t--enter-language-name"></label>
+			<input type="text" id="new-language-name">
+			<button id="open-language-creator" class="t--create-language"></button>
+		</div>
+	</section>
+
 	<table id="language-list" class="no-edge">
 		<caption class="t--language-list-caption"></caption>
 		<template id="language-row">
 			<tr class="language-row">
-				<td class="language-select"><input type="button" value=" " data-state=" " data-lang-id="" class="language-select"></td>
+				<td class="language-select"><input type="button" value=" " data-state=" " data-lang-id=""
+						class="language-select"></td>
 				<td><a href="" class="language-name"></a></td>
 				<td class="language-name-en"></td>
 				<td class="language-code"></td>

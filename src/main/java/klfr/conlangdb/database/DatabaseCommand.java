@@ -41,7 +41,13 @@ import klfr.conlangdb.CResources;
  * DatabaseCommand implements Future, and its implementation of that interface
  * delegate to the last task that was created by this database command. This
  * allows the command to be used like any other future, i.e. as a value provider
- * that becomes available after an unspecified amount of time.
+ * that becomes available after an unspecified amount of time.<br>
+ * <br>
+ * Because DatabaseCommands recieve connections, they can (and are allowed to)
+ * set connection properties like auto-commit mode. Therefore, no command should
+ * rely on any particular property having a certain value. If the command needs
+ * a certain property to be configured in a certain way, it should
+ * unconditionally do so.
  * 
  * @param <T> The type parameter represents the return type of the command.
  *            Commands that do not return anything, such as the NoArgumentCmd
@@ -89,6 +95,12 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 		this.toExecute = toExecute;
 	}
 
+	/** Interface for simple database command functions. */
+	@FunctionalInterface
+	public interface DatabaseFunction<U> {
+		public Optional<U> execute(Connection c) throws SQLException;
+	}
+
 	/**
 	 * Create a simple no argument database command from a function that defines
 	 * what action will be executed by the command. This is the preferred method of
@@ -100,7 +112,7 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 	 * @return A new database command that will simply execute the given function
 	 *         when it is processed.
 	 */
-	public static <U> DatabaseCommand<U> from(final Function<Connection, Optional<U>> toExecute) {
+	public static <U> DatabaseCommand<U> from(final DatabaseFunction<U> toExecute) {
 		return new NoArgumentCmd<U>(toExecute) {
 			private static final long serialVersionUID = -8785363225098048576L;
 
@@ -225,9 +237,18 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 	 */
 	public static class NoArgumentCmd<T> extends DatabaseCommand<T> {
 		private static final long serialVersionUID = 1L;
+		private final DatabaseFunction<T> realToExecute;
 
-		public NoArgumentCmd(final Function<Connection, Optional<T>> toExecute) {
-			super(toExecute);
+		public NoArgumentCmd(final DatabaseFunction<T> toExecute) {
+			super(con -> {
+				try {
+					return toExecute.execute(con);
+				} catch (SQLException e) {
+					log.log(Level.SEVERE, "SQL exception in NoArgumentCommand", e);
+					return Nothing();
+				}
+			});
+			this.realToExecute = toExecute;
 		}
 
 		@Override
@@ -242,7 +263,7 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 
 		@Override
 		public DatabaseCommand<T> clone() {
-			return new NoArgumentCmd<T>(this.toExecute);
+			return new NoArgumentCmd<T>(this.realToExecute);
 		}
 	}
 
@@ -259,7 +280,6 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 		public InitDatabaseCmd() {
 			super(con -> {
 				try {
-					final var oldCommit = con.getAutoCommit();
 					con.setAutoCommit(true);
 					final var stmt = con.createStatement();
 					/*
@@ -370,7 +390,6 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 							+ ");");
 
 					stmt.executeBatch();
-					con.setAutoCommit(oldCommit);
 				} catch (final SQLException e) {
 					throw new RuntimeException(e);
 				}
@@ -413,6 +432,7 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 		public CreateServerFunctionsCmd() {
 			super(con -> {
 				try {
+					con.setAutoCommit(true);
 					final var stmt = con.createStatement();
 					final var files = new Scanner(CResources.open("server-functions/functions.txt").get());
 					while (files.hasNextLine()) {
@@ -698,6 +718,7 @@ public abstract class DatabaseCommand<T> extends CObject implements Future<Optio
 		public SQLCmd(final String sql) {
 			super(con -> {
 				try {
+					con.setAutoCommit(true);
 					final var stmt = con.createStatement();
 					stmt.execute(sql);
 					return Optional.ofNullable(stmt.getResultSet());

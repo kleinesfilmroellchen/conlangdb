@@ -140,7 +140,7 @@ public class TkListAPI implements Take {
 			final var jsarr = new JSONArray();
 			final var arrayset = sqlarr.getResultSet();
 			while (arrayset.next()) {
-				jsarr.put(arrayset.getObject(2));
+				jsarr.put(arrayset.getObject(1));
 			}
 			json.put(key, jsarr);
 		});
@@ -253,7 +253,6 @@ public class TkListAPI implements Take {
 			final var json = dbcommand.get().orElse(new JSONArray());
 
 			return new RsWithHeader(new RsCWrap(new RsJSON(json)), "Cache-Control", "public, max-age=10");
-
 		} catch (IllegalArgumentException e1) {
 			log.log(Level.WARNING, "Illegal arguments to data list API.", e1);
 			return new RsCWrap(new RsEmpty(), HttpStatusCode.BAD_REQUEST);

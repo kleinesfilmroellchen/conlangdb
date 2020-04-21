@@ -70,6 +70,13 @@ window.addEventListener('DOMContentLoaded', () => {
 		tbody.querySelectorAll('input[type="button"].language-select').forEach(adjustLanguageSelectBtnValue);
 
 	}).catch(console.error);
+
+	document.querySelector('button#open-language-creator')?.addEventListener('click', async event => {
+		const langToCreate = document.querySelector('input#new-language-name').value;
+		const newpath = (window.location + '').replace(window.location.pathname +'?' + window.location.search, `/language/${langToCreate}?action=create`);
+		console.log(newpath);
+		window.location.assign(newpath)
+	});
 });
 
 function adjustLanguageSelectBtnValue(button) {

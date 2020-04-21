@@ -6,6 +6,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +31,7 @@ import klfr.conlangdb.util.StringStreamUtil;
 /**
  * Container for the three HTTP methods associated with the single language API.
  */
-public final class TkLanguageAPI {
+public final class TkLanguageAPI extends CObject {
 
 	public static final Pattern languageAPIPattern = Pattern.compile("/language/(\\S+)");
 
@@ -109,29 +110,29 @@ public final class TkLanguageAPI {
 				log.finer(() -> rq.toString());
 
 				// parse language
-				final var pathMatcher = languageAPIPattern.matcher(new RqRequestLine.Base(request).uri());
-				if (!pathMatcher.matches())
+				final var maybeModifedLanguage = parseLanguage(request);
+				if (maybeModifedLanguage.isEmpty())
 					return new RsCWrap(HttpStatusCode.BAD_REQUEST);
-				final var modifiedLanguage = pathMatcher.group(1);
-				log.fine(() -> "Modifying language %s".formatted(modifiedLanguage));
+				final var modifiedLanguage = maybeModifedLanguage.get();
 
 				final var command = DatabaseCommand.from(con -> {
 					try {
+						con.setAutoCommit(true);
 						// check whether the language that is to be modified exists
 						final var existenceChecker = con.prepareStatement("select id from tlanguage where id=?;");
 						existenceChecker.setString(1, modifiedLanguage);
-						final var exists = existenceChecker.execute();
-						if (exists) {
+						final var exists = existenceChecker.executeQuery();
+						// if there was a record found, the first next() call will return true and point to the language's id
+						if (exists.next()) {
+							log.fine(() -> "DATABASE modifying language %s".formatted(modifiedLanguage));
 							// the language exists, do UPDATE (which may change the language id)
 							// also, this may fail if there are no valid keys, but that is ok (caught below)
 							final var updator = con.prepareStatement(new StringBuilder("update tlanguage set ")
 									.append(String.join(", ", List.of(rq.has("id") ? "id=?" : "",
-											rq.has("name") ? "name=?" : "",
-											rq.has("name-en") ? "name_en=?" : "",
+											rq.has("name") ? "name=?" : "", rq.has("name-en") ? "name_en=?" : "",
 											rq.has("description") ? "description=?" : "",
 											rq.has("description-en") ? "description_en=?" : "",
-											rq.has("fonturl") ? "fonturl=?" : "",
-											rq.has("config") ? "config=?" : "")
+											rq.has("fonturl") ? "fonturl=?" : "", rq.has("config") ? "config=?" : "")
 											.stream().filter(x -> !x.isBlank()).collect(Collectors.toList())))
 									.append(" where id=?;").toString());
 							// set all existent keys, use counter to keep track of parameter index
@@ -149,16 +150,17 @@ public final class TkLanguageAPI {
 							// use the new id from the json if existent
 							return updateCount > 0 ? Just(rq.optString("id", modifiedLanguage)) : Nothing();
 						} else {
+							log.fine(() -> "DATABASE creating language %s".formatted(modifiedLanguage));
 							// the language does not exist, do INSERT
 							final var inserter = con.prepareStatement(
 									"insert into tlanguage ( id, name, name_en, description, description_en, fonturl, config ) values (?, ?, ?, ?, ?, ?, ?) on conflict do nothing;");
-							inserter.setString(1, rq.optString("id"));
-							inserter.setString(2, rq.getString("name"));
-							inserter.setString(3, rq.getString("name-en"));
-							inserter.setString(4, rq.getString("description"));
-							inserter.setString(5, rq.getString("description-en"));
-							inserter.setString(6, rq.getString("fonturl"));
-							inserter.setString(7, rq.getString("config"));
+							inserter.setString(1, modifiedLanguage);
+							inserter.setString(2, rq.optString("name"));
+							inserter.setString(3, rq.optString("name-en"));
+							inserter.setString(4, rq.optString("description"));
+							inserter.setString(5, rq.optString("description-en"));
+							inserter.setString(6, rq.optString("fonturl"));
+							inserter.setString(7, rq.optString("config"));
 
 							final var insertionCount = inserter.executeUpdate();
 							return insertionCount > 0 ? Just(modifiedLanguage) : Nothing();
@@ -211,14 +213,54 @@ public final class TkLanguageAPI {
 
 		@Override
 		public Response act(Request request) {
-			// TODO Auto-generated method stub
-			return null;
+			try {
+				final var maybeDeletedLanguage = parseLanguage(request);
+				if (maybeDeletedLanguage.isEmpty())
+					return new RsCWrap(HttpStatusCode.BAD_REQUEST);
+				final var deletedLanguage = maybeDeletedLanguage.get();
+				log.fine(() -> "Deleting language %s".formatted(deletedLanguage));
+
+				final var command = DatabaseCommand.from(con -> {
+					con.setAutoCommit(false);
+					final var preDelete = con.setSavepoint();
+					final var stmt = con.prepareStatement("delete from tlanguage where id=?;");
+					stmt.setString(1, deletedLanguage);
+					final var deleteCount = stmt.executeUpdate();
+					if (deleteCount != 1) {
+						log.warning("Deleted %s entries, this is wrong.");
+						con.rollback(preDelete);
+						return Nothing();
+					}
+					con.commit();
+					return Just(deleteCount);
+				});
+				final var result = DatabaseCommunicator.submitCommand(command).get();
+				if (result.isEmpty())
+					return new RsCWrap(HttpStatusCode.BAD_REQUEST);
+				return new RsCWrap(HttpStatusCode.NO_CONTENT);
+			} catch (IOException | InterruptedException | ExecutionException e) {
+				log.log(Level.SEVERE, "Server exception", e);
+				return new RsCWrap(HttpStatusCode.INTERNAL_SERVER_ERROR);
+			}
 		}
 
 		@Override
 		public CObject clone() {
 			return new Delete();
 		}
+	}
+
+	private static Optional<String> parseLanguage(final Request request) throws IOException {
+		// parse language
+		final var pathMatcher = languageAPIPattern.matcher(new RqRequestLine.Base(request).uri());
+		if (!pathMatcher.matches())
+			return Nothing();
+		return Just(pathMatcher.group(1));
+	}
+
+	@Override
+	public CObject clone() {
+		return new TkLanguageAPI();
 	}
 
 }

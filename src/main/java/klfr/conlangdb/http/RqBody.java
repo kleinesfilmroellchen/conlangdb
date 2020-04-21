@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.takes.Request;
-import org.takes.Response;
-import org.takes.Take;
 import org.takes.rq.RqHeaders;
 
 import klfr.conlangdb.CObject;

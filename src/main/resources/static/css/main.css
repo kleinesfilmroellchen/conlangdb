@@ -33,12 +33,14 @@ body {
 	width: 100vw;
 	height: 100vh;
 	font-family: 'Noto Sans', 'Segoe UI', 'Segoe UI Symbol', sans-serif;
-	font-size: 13pt;
 	background: var(--background);
 	color: var(--foreground);
 }
 
 h1, h2, h3, h4, h5, h6, div#language-edit-container > label {
+	margin-block-start: 1rem;
+	margin-block-end: 0.5rem;
+	margin-block: 0;
 	font-family: Balthazar, Caveat, 'Noto Sans', cursive;
 	font-size: 140%;
 }
@@ -59,6 +61,10 @@ a:visited {
 	color: var(--accent-2-dark);
 }
 
+hr {
+	margin: 3em 0;
+}
+
 /* CSS GRID 4THEWIN! */
 #page {
 	display: grid;
@@ -71,13 +77,16 @@ a:visited {
 							 "footer footer";
 		grid-template-columns: auto 30%;
 		grid-template-rows: auto 15mm;
+		column-gap: 1rem;
 		margin: 2.5cm 7mm 0;
 	}
-	footer {
-		flex-direction: row;
+	main {
+		margin-bottom: 3em;
 	}
-	footer >* {
-		margin: 0 1em;
+	footer {
+		grid-template-columns: repeat(auto-fit, minmax(0, auto));
+		column-gap: 2em;
+		font-size: 80%;
 	}
 }
 @media screen and (max-width: 699px) {
@@ -90,17 +99,9 @@ a:visited {
 		margin: 2.5cm 5% 0;
 	}
 	footer {
-		flex-direction: column;
+		grid-template-rows: repeat(auto-fit, minmax(0, auto));
+		row-gap: 2em;
 	}
-	footer >* {
-		margin: 1em 0;
-	}
-}
-
-/*remove spacings for all direct children of the main layouter*/
-#page >* {
-	padding: 0;
-	margin: 0;
 }
 
 aside {
@@ -116,9 +117,8 @@ main {
 
 footer {
 	grid-area: footer;
-	display: flex;
-	align-items: flex-start;
-	vertical-align: middle;
+	display: grid;
+	place-content: center;
 }
 
 /* Help toggle logic */
@@ -256,20 +256,67 @@ tr {
 	break-inside: avoid;
 }
 
+/* Language pages layout */
+section#new-language {
+	margin-bottom: 1.5em;
+}
+input#new-language-dialog-open ~ div#new-language-dialog {
+	display: none;
+}
+input#new-language-dialog-open:checked ~ div#new-language-dialog {
+	display: grid;
+}
+div#new-language-dialog {
+	grid-auto-rows: auto;
+	grid-template-columns: auto;
+	row-gap: 0.5em;
+}
+div#new-language-dialog > * { margin-right: auto; }
+
 div#language-edit-container {
 	display: grid;
 	grid-template-columns: auto;
 	grid-auto-rows: min-content;
+	row-gap: 0.25em;
 	margin-bottom: 2em;
 }
 div#language-edit-container > * {
 	/*allows each element to take its preferred width*/
 	margin-right: auto;
-	margin-bottom: 0.75em;
 }
-div#language-edit-container > label {
-	margin-bottom: 0.25em;
+div#language-edit-container > :not(label) {
+	margin-bottom: 0.5em;
 }
+
+div#language-create-container {
+	display: grid;
+	/* if necessary, descriptor colum will take up at most 1/4 of body width */
+	grid-template-columns: [labl-start] minmax(3em, 1fr) [labl-end inpt-start] 3fr [inpt-end];
+	grid-auto-rows: min-content;
+	column-gap: 0.5em;
+	row-gap: 0.75em;
+	margin-bottom: 2em;
+}
+div#language-create-container > label {
+	/* by forcing all labels into the first column, all other elements are in the second column */
+	grid-column: labl;
+}
+div#language-create-container > :not(label) {
+	grid-column: inpt;
+}
+@media screen and (max-width: 699px) {
+	div#language-create-container {
+		display: grid;
+		grid-template-columns: auto;
+		/*I LOVE CSS GRID! THIS IS AMAZING! LOOK MUM!*/
+		/*also just observe on how the css syntax highlighter breaks down on so much nested madness*/
+		grid-template-rows: repeat(auto-fit, [labl-start] auto [labl-end inpt-start] auto [inpt-end] );
+		column-gap: 0.5em;
+		row-gap: 0.75em;
+		margin-bottom: 2em;
+	}
+}
+
 input#language-id-edit {
 	width: 3em;
 }
@@ -299,11 +346,11 @@ input, textarea {
 	border-radius: 0;
 	border-color: var(--accent-1-dark);
 	border-style: solid;
+	transition: all 100ms linear;
 	font: inherit;
 }
 input:not(:read-only):focus, textarea:not(:read-only):focus {
-	outline: var(--foreground) solid 2px;
-	outline-offset: var(--button-border-width);
+	border-color: var(--accent-1-light);
 }
 
 textarea {
@@ -328,7 +375,7 @@ input[type=button], button {
 	border-radius: 0;
 	position: relative;
 	margin: 0;
-	padding: 0.8em 2em;
+	padding: 0.5em 1.5em;
 	font-weight: bold;
 }
 input[type=button]::after, button::after {
@@ -342,14 +389,16 @@ input[type=button]::after, button::after {
 	bottom: 0;
 	top: 0;
 	z-index: -1;
-	transition: width 250ms ease;
+	transition: width 50ms ease;
 }
 input[type=button]:hover::after, button:hover::after {
 	width: 100%;
 	transition: width 150ms ease;
 }
-input[type=button]:active, button:active {
+input[type=button]:active, button:active,
+input[type=button]:focus, button:focus {
 	background: var(--accent-3-light);
+	outline: none;
 }
 
 input[type=button]:disabled, button:disabled {
