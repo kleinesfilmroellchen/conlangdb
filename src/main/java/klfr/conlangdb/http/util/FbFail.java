@@ -1,4 +1,4 @@
-package klfr.conlangdb.http;
+package klfr.conlangdb.http.util;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,6 +12,11 @@ import org.takes.rs.RsWithStatus;
 
 import klfr.conlangdb.CObject;
 
+/**
+ * Fallback that handles a specific HTTP error code. It prints a fail message to
+ * the logging system and returns a Response with the standard message, e.g.
+ * "Not Found" or "Bad Request" in the HTTP reason and body.
+ */
 public class FbFail extends CObject implements Fallback {
 	private static final long serialVersionUID = 1L;
 

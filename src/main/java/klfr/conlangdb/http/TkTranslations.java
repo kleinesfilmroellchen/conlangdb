@@ -10,6 +10,8 @@ import org.takes.rs.RsWithHeader;
 
 import klfr.conlangdb.CObject;
 import klfr.conlangdb.TranslationProvider;
+import klfr.conlangdb.http.util.RsJSON;
+import klfr.conlangdb.http.util.TkFilesAdvanced;
 
 /**
  * Take for processing translations. This is a Regex take which recieves the

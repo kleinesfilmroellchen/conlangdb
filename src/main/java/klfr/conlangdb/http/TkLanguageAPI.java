@@ -26,6 +26,9 @@ import org.takes.rs.RsWithHeader;
 import klfr.conlangdb.CObject;
 import klfr.conlangdb.database.DatabaseCommand;
 import klfr.conlangdb.database.DatabaseCommunicator;
+import klfr.conlangdb.http.util.HttpStatusCode;
+import klfr.conlangdb.http.util.RqBody;
+import klfr.conlangdb.http.util.RsJSON;
 import klfr.conlangdb.util.StringStreamUtil;
 
 /**
@@ -33,7 +36,7 @@ import klfr.conlangdb.util.StringStreamUtil;
  */
 public final class TkLanguageAPI extends CObject {
 
-	public static final Pattern languageAPIPattern = Pattern.compile("/language/(\\S+)");
+	public static final Pattern languageAPIPattern = Pattern.compile("/language/(\\S{1,3})");
 
 	/**
 	 * Get method on the single language API. Returns language information in JSON

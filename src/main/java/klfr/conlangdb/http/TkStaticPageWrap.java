@@ -18,6 +18,7 @@ import org.takes.rs.RsWithType;
 
 import klfr.conlangdb.CObject;
 import klfr.conlangdb.CResources;
+import klfr.conlangdb.http.util.RsUnicodeText;
 import klfr.conlangdb.util.StringStreamUtil;
 
 /**

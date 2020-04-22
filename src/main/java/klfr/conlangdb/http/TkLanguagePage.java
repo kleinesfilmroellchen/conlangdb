@@ -11,6 +11,7 @@ import org.takes.rs.RsSimple;
 
 import klfr.conlangdb.CObject;
 import klfr.conlangdb.CResources;
+import klfr.conlangdb.http.util.HttpStatusCode;
 import klfr.conlangdb.util.StringStreamUtil;
 
 /**

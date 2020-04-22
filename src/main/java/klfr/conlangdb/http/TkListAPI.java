@@ -30,6 +30,8 @@ import org.takes.rs.RsWithHeader;
 import klfr.conlangdb.database.DatabaseCommand;
 import klfr.conlangdb.database.DatabaseCommunicator;
 import klfr.conlangdb.database.SortOrder;
+import klfr.conlangdb.http.util.HttpStatusCode;
+import klfr.conlangdb.http.util.RsJSON;
 
 /**
  * An API template which outputs a data list in JSON format to the requestor.
@@ -298,7 +300,11 @@ public class TkListAPI implements Take {
 				+ (limit >= 0 ? (" LIMIT " + limit) : "") + (offset >= 0 ? (" OFFSET " + offset) : "") + ";";
 	};
 
-	public static final QueryBuilder wordQueryBuilder = (fields, order, orderingName, queryParameters, offset,
+	/**
+	 * List API that recieves data from the word list and presents dictionary data to the user.
+	 * The additional query parameter that the user can give is "to" for the target language.
+	 */
+	public static final QueryBuilder dictionaryQueryBuilder = (fields, order, orderingName, queryParameters, offset,
 			limit) -> {
 		final Function<String, String> fieldMapper = elt -> {
 			// only valid elements are not nulled
@@ -326,7 +332,8 @@ public class TkListAPI implements Take {
 						(limit >= 0 ? (" LIMIT " + limit) : "") + (offset >= 0 ? (" OFFSET " + offset) : ""));
 			}
 			return String.format("SELECT %s, (select Native from TWord translation "
-					+ "join RelTranslation on (translation.ID=RelTranslation.WIDOne or translation.ID=RelTranslation.WIDTwo) where (TWord.ID=RelTranslation.WIDOne or TWord.ID=RelTranslation.WIDTwo) ) "
+					+ "join RelTranslation on (translation.ID=RelTranslation.WIDOne or translation.ID=RelTranslation.WIDTwo) "
+					+ "where (TWord.ID=RelTranslation.WIDOne or TWord.ID=RelTranslation.WIDTwo) ) "
 					+ "FROM TWord ORDER BY %s %s %s;",
 					String.join(", ",
 							fields.stream().map(fieldMapper).filter(x -> x != null).collect(Collectors.toSet())),

@@ -9,6 +9,7 @@ import org.takes.rs.RsWithHeader;
 import org.takes.rs.RsWithStatus;
 
 import klfr.conlangdb.CObject;
+import klfr.conlangdb.http.util.HttpStatusCode;
 
 /**
  * Response wrapper for the ConlangDB server responses. This composes a couple

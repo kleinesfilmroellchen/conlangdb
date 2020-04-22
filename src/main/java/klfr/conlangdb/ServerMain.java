@@ -18,20 +18,22 @@ import org.takes.http.BkParallel;
 import org.takes.http.Exit;
 import org.takes.http.FtBasic;
 import org.takes.rs.RsHtml;
-import org.takes.tk.TkEmpty;
 
-import klfr.conlangdb.http.FbFail;
-import klfr.conlangdb.http.HttpStatusCode;
-import klfr.conlangdb.http.TkFilesAdvanced;
+import klfr.conlangdb.http.TkDictionaryPage;
 import klfr.conlangdb.http.TkLanguageAPI;
 import klfr.conlangdb.http.TkLanguageListPage;
 import klfr.conlangdb.http.TkLanguagePage;
 import klfr.conlangdb.http.TkListAPI;
-import klfr.conlangdb.http.TkLog;
 import klfr.conlangdb.http.TkMainPage;
+import klfr.conlangdb.http.TkSingleWordAPI;
+import klfr.conlangdb.http.TkSingleWordPage;
 import klfr.conlangdb.http.TkStaticPageWrap;
 import klfr.conlangdb.http.TkStatistics;
 import klfr.conlangdb.http.TkTranslations;
+import klfr.conlangdb.http.util.FbFail;
+import klfr.conlangdb.http.util.HttpStatusCode;
+import klfr.conlangdb.http.util.TkFilesAdvanced;
+import klfr.conlangdb.http.util.TkLog;
 
 /**
  * Main class of the server.
@@ -120,10 +122,19 @@ public class ServerMain extends CObject {
 									new FkMethods("POST", new TkLanguageAPI.Post()),
 									new FkMethods("DELETE", new TkLanguageAPI.Delete()))),
 					// Word list page/api (WIP)
-					new FkRegex(Pattern.quote("/word/list"),
-							new TkFork(new FkTypes("text/html", new TkStaticPageWrap(new TkEmpty(), "words")),
-									new FkTypes("application/json",
-											new TkListAPI(TkListAPI.wordQueryBuilder, List.of("text"), "text")))),
+					new FkRegex(Pattern.quote("/word/list"), new TkFork(
+							new FkTypes("text/html", new TkStaticPageWrap(new TkDictionaryPage(), "dictionary")),
+							new FkTypes("application/json",
+									new TkListAPI(TkListAPI.dictionaryQueryBuilder, List.of("text"), "text")))),
+					new FkRegex("/word/(\\S{1,3})/(.+)",
+							new TkFork(
+									new FkMethods("GET",
+											new TkFork(
+													new FkTypes("text/html",
+															new TkStaticPageWrap(new TkSingleWordPage(), "word")),
+													new FkTypes("application/json", new TkSingleWordAPI.Get()))),
+									new FkMethods("POST", new TkSingleWordAPI.Post()),
+									new FkMethods("DELETE", new TkSingleWordAPI.Delete()))),
 					//// API
 					// Translation JSON maps
 					new FkRegex("\\/translation\\/([a-z]{2,3})(?:\\_([A-Z]{2,3}))?", new TkTranslations()),

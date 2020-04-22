@@ -1,4 +1,4 @@
-package klfr.conlangdb.http;
+package klfr.conlangdb.http.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +24,7 @@ import org.takes.rs.RsWithHeaders;
 
 import klfr.conlangdb.CObject;
 import klfr.conlangdb.CResources;
+import klfr.conlangdb.http.RsCWrap;
 
 /**
  * Advanced static file server that extends TkFiles' behavior. This file take

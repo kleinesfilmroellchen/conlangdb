@@ -1,4 +1,4 @@
-package klfr.conlangdb.http;
+package klfr.conlangdb.http.util;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +30,7 @@ public class TkLog extends CObject implements Take {
 			var rqline = new RqRequestLine.Base(req);
 			var socketrq = new RqSocket(rqline);
 			var remote = socketrq.getRemoteAddress();
-			log.info("%6s %s from %s".formatted(rqline.method(), rqline.uri(), remote));
+			log.info("HTTP %6s %s from %s".formatted(rqline.method(), rqline.uri(), remote));
 			return sub.act(socketrq);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Exception in Take.", e);

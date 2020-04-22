@@ -1,4 +1,4 @@
-package klfr.conlangdb.http;
+package klfr.conlangdb.http.util;
 
 import java.io.IOException;
 import java.io.InputStream;
