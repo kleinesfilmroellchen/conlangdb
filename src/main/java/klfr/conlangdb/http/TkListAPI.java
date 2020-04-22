@@ -103,54 +103,6 @@ public class TkListAPI implements Take {
 	private final Set<String> standardFields;
 	private final String standardOrdering;
 
-	@FunctionalInterface
-	private static interface SQLValueSettingFunction {
-		@FunctionalInterface
-		public static interface SQLValueSetterCurried {
-			public void apply(JSONObject obj, ResultSet rset) throws SQLException;
-		}
-
-		public SQLValueSetterCurried f(String key);
-	}
-
-	/**
-	 * Map for statically preparing simple functions for setting sql return values
-	 * onto JSON objects. The functions are curried in that they first recieve the
-	 * value's key / the column name (constant for any one query) and then the JSON
-	 * object for the row and the result set pointing to the correct row (both
-	 * change for every row).
-	 */
-	private static final Map<Integer, SQLValueSettingFunction> sqlTypesSetters = new HashMap<>(20, 0.5f);
-	static {
-		sqlTypesSetters.put(java.sql.Types.BIGINT, key -> (json, rset) -> json.put(key, rset.getLong(key)));
-		sqlTypesSetters.put(java.sql.Types.INTEGER, key -> (json, rset) -> json.put(key, rset.getInt(key)));
-		sqlTypesSetters.put(java.sql.Types.SMALLINT, key -> (json, rset) -> json.put(key, rset.getShort(key)));
-		sqlTypesSetters.put(java.sql.Types.TINYINT, key -> (json, rset) -> json.put(key, rset.getByte(key)));
-		sqlTypesSetters.put(java.sql.Types.BOOLEAN, key -> (json, rset) -> json.put(key, rset.getBoolean(key)));
-		sqlTypesSetters.put(java.sql.Types.BIT, key -> (json, rset) -> json.put(key, rset.getBoolean(key)));
-		sqlTypesSetters.put(java.sql.Types.CHAR, key -> (json, rset) -> json.put(key, rset.getString(key)));
-		sqlTypesSetters.put(java.sql.Types.VARCHAR, key -> (json, rset) -> json.put(key, rset.getString(key)));
-		sqlTypesSetters.put(java.sql.Types.DOUBLE, key -> (json, rset) -> json.put(key, rset.getDouble(key)));
-		sqlTypesSetters.put(java.sql.Types.FLOAT, key -> (json, rset) -> json.put(key, rset.getFloat(key)));
-		sqlTypesSetters.put(java.sql.Types.DECIMAL,
-				key -> (json, rset) -> json.put(key, rset.getBigDecimal(key).toPlainString()));
-		sqlTypesSetters.put(java.sql.Types.DATE, key -> (json, rset) -> json.put(key, rset.getDate(key)));
-		sqlTypesSetters.put(java.sql.Types.TIME, key -> (json, rset) -> json.put(key, rset.getTime(key)));
-		sqlTypesSetters.put(java.sql.Types.TIMESTAMP, key -> (json, rset) -> json.put(key, rset.getTimestamp(key)));
-		sqlTypesSetters.put(java.sql.Types.ARRAY, key -> (json, rset) -> {
-			final Array sqlarr = rset.getArray(key);
-			final var jsarr = new JSONArray();
-			final var arrayset = sqlarr.getResultSet();
-			while (arrayset.next()) {
-				jsarr.put(arrayset.getObject(1));
-			}
-			json.put(key, jsarr);
-		});
-	}
-	/** Default setter for unrecognized types. */
-	private static final SQLValueSettingFunction defaultSetter = key -> (json, rset) -> json.put(key,
-			String.valueOf(rset.getObject(key)));
-
 	/**
 	 * Creates a new data list API that will use the specified query executor
 	 * function.
@@ -216,31 +168,19 @@ public class TkListAPI implements Take {
 					final var meta = rset.getMetaData();
 
 					final JSONArray arr = new JSONArray();
-					// These functions will each process one column of the result. They access the
-					// result set and modify the JSON object. As the functions do not care about
-					// order or indices, we can use sets, because no two functions can be equal in
-					// the Java RE.
-					final Set<SQLValueSettingFunction.SQLValueSetterCurried> processors = new HashSet<>(
-							meta.getColumnCount(), 0.9f);
-					for (int i = 1; i <= meta.getColumnCount(); ++i) {
-						final int ctype = meta.getColumnType(i);
-						final String cname = meta.getColumnName(i);
-						log.finer(ctype + " " + cname);
-						// Use the prepared list of type-aware JSON object setters.
-						// These are curried, i.e. "preloaded" with the column name which is constant.
-						// also, escape the column name to enable non-identifier column names
-						processors.add(sqlTypesSetters.getOrDefault(ctype, defaultSetter).f(cname));
-					}
+					final var columnCount = meta.getColumnCount();
 					while (rset.next()) {
 						final var jsonObj = new JSONObject();
-						// Each processor already knows the column name, we do not need to pass it.
-						processors.forEach(processor -> {
-							try {
-								processor.apply(jsonObj, rset);
-							} catch (SQLException e) {
-								log.log(Level.SEVERE, "Exception while retrieving single column value.", e);
-							}
-						});
+						for (int i = 1; i <= columnCount; ++i) {
+							log.finer(rset.getObject(i).getClass().toString());
+							// the result set will convert its data to normal java data types such as
+							// Integer, Boolean and String, JSONObject's put(Object) detects primitive
+							// wrapper types (Integer, Float etc.) as well as complicated objects and
+							// represents them accordingly. No type detection is necessary at all. This also
+							// means that via reflection, non-standard-library objects are represented by
+							// querying their getXXX() and isXXX() methods. I LOVE JAVA!
+							jsonObj.put(meta.getColumnName(i), rset.getObject(i));
+						}
 						arr.put(jsonObj);
 					}
 
@@ -301,8 +241,9 @@ public class TkListAPI implements Take {
 	};
 
 	/**
-	 * List API that recieves data from the word list and presents dictionary data to the user.
-	 * The additional query parameter that the user can give is "to" for the target language.
+	 * List API that recieves data from the word list and presents dictionary data
+	 * to the user. The additional query parameter that the user can give is "to"
+	 * for the target language.
 	 */
 	public static final QueryBuilder dictionaryQueryBuilder = (fields, order, orderingName, queryParameters, offset,
 			limit) -> {
