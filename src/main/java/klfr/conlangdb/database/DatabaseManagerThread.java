@@ -50,7 +50,7 @@ class DatabaseManagerThread extends Thread {
 	 */
 	public DatabaseManagerThread(final Arguments args, final Lock signal, final Condition cond,
 			final BlockingQueue<DatabaseCommand<Object>> queue) {
-		super(Thread.currentThread().getThreadGroup(), "DatabaseManager");
+		super(Thread.currentThread().getThreadGroup(), "DBManagr");
 		super.setDaemon(true);
 		log.fine(f("CONSTRUCT %s", this.getClass().getCanonicalName()));
 		this.args = args;
@@ -86,7 +86,6 @@ class DatabaseManagerThread extends Thread {
 			signal.lock();
 			try {
 				databaseConnection = connect(args);
-				log.finer(databaseConnection.toString());
 				cond.signalAll();
 			} finally {
 				signal.unlock();

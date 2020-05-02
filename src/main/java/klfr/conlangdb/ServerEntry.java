@@ -3,11 +3,14 @@ package klfr.conlangdb;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
+import java.time.temporal.ChronoField;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.Optional;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
@@ -39,27 +42,45 @@ public class ServerEntry extends CObject {
 		});
 		// create a handler with custom compact one-line formatting
 		var ch = new ConsoleHandler();
-		ch.setLevel(Level.FINER);
+		ch.setLevel(Level.ALL);
 		ch.setFormatter(new Formatter() {
+			private final DateTimeFormatter dateTimeFmt = new DateTimeFormatterBuilder()
+					.appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(":")
+					.appendValue(ChronoField.MINUTE_OF_HOUR, 2).appendLiteral(":")
+					.appendValue(ChronoField.SECOND_OF_MINUTE, 2).appendLiteral(":")
+					.appendValue(ChronoField.MILLI_OF_SECOND, 3).toFormatter();
+
 			@Override
 			public String format(LogRecord record) {
 				var msg = record.getMessage();
 				try {
-					record.getResourceBundle().getString(record.getMessage());
+					msg = record.getResourceBundle().getString(record.getMessage());
 				} catch (MissingResourceException | NullPointerException e) {
 					// do nothing
 				}
-				var time = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)
-						.format(record.getInstant().atZone(ZoneId.systemDefault()));
-				var level = record.getLevel().getLocalizedName().substring(0,
-						Math.min(record.getLevel().getLocalizedName().length(), 6));
-				var logName = record.getLoggerName();// "%s.%s".formatted(record.getSourceClassName(),
-														// record.getSourceMethodName());
+				final var time = dateTimeFmt.format(record.getInstant().atZone(ZoneId.systemDefault()));
+				final var level = record.getLevel().getLocalizedName().substring(0,
+						Math.min(record.getLevel().getLocalizedName().length(), 5));
+				// the replacement makes the application's logs significantly smaller
+				final var logName = record.getLoggerName().replace("klfr.conlangdb.", "~");
+				final var threadname = threadFromID(record.getThreadID()).orElse(Thread.currentThread()).getName().replace("BkParallel", "HTTPBk");
 
-				return "[%s %-40s |%6s] %s%n".formatted(time, logName, level, msg) + (record.getThrown() == null ? ""
-						: f("EXCEPTION: %s | Stack trace:%n%s", record.getThrown().toString(),
-								Arrays.asList(record.getThrown().getStackTrace()).stream().map(x -> x.toString())
-										.collect(() -> new StringBuilder(), (builder, str) -> builder.append("in ").append(str).append(System.lineSeparator()), (b1, b2) -> b1.append(b2) )));
+				return "[%s %-10s:%-40s|%5s] %s%n".formatted(time, threadname, logName, level, msg)
+						+ (record.getThrown() == null ? ""
+								: f("EXCEPTION: %s | Stack trace:%n%s", record.getThrown().toString(),
+										Arrays.asList(record.getThrown().getStackTrace()).stream()
+												.map(x -> x.toString()).collect(() -> new StringBuilder(),
+														(builder, str) -> builder.append("in ").append(str)
+																.append(System.lineSeparator()),
+														(b1, b2) -> b1.append(b2))));
+			}
+
+			/**
+			 * Helper that retrieves a reference to the thread object given the thread's ID,
+			 * or Nothing if it doesn't exist.
+			 */
+			private Optional<Thread> threadFromID(final int threadID) {
+				return Thread.getAllStackTraces().keySet().stream().filter(t -> t.getId() == threadID).findAny();
 			}
 		});
 		LogManager.getLogManager().reset();

@@ -18,10 +18,10 @@ import org.takes.rq.RqHref;
 import org.takes.rs.RsEmpty;
 import org.takes.rs.RsWithHeader;
 
-import klfr.conlangdb.database.DatabaseCommand.StatisticsCmd;
 import klfr.conlangdb.http.util.HttpStatusCode;
 import klfr.conlangdb.http.util.RsJSON;
 import klfr.conlangdb.database.DatabaseCommunicator;
+import klfr.conlangdb.database.commands.StatisticsCmd;
 
 public class TkStatistics implements Take {
 

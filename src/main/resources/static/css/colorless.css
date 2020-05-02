@@ -1,0 +1,23 @@
+/* Colorless styles: colorless.css */
+:root {
+	--background: white;
+	--foreground: black;
+	--accent-1-light: #cacaca;
+	--accent-1-dark: #5f5f5f;
+	--accent-2-light: #bbbbbb;
+	--accent-2-dark: #313131;
+	--accent-3-light: #8d8d8d;
+	--accent-3-dark: #242424;
+}
+@media (prefers-color-scheme: dark) {
+	:root {
+		--background: black;
+		--foreground: white;
+		--accent-1-light: #5f5f5f;
+		--accent-1-dark: #cacaca;
+		--accent-2-light: #313131;
+		--accent-2-dark: #bbbbbb;
+		--accent-3-light: #242424;
+		--accent-3-dark: #8d8d8d;
+	}
+}

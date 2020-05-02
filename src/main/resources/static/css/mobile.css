@@ -1,0 +1,24 @@
+/* Mobile styles: mobile.css */
+#page {
+	grid-template-areas: "main"
+							"help"
+							"footer";
+	grid-template-columns: 1fr;
+	grid-template-rows: auto auto auto;
+	margin: 2.5cm 5% 0;
+}
+footer {
+	grid-template-rows: repeat(auto-fit, minmax(0, auto));
+	row-gap: 2em;
+}
+
+div#language-create-container {
+	display: grid;
+	grid-template-columns: auto;
+	/*I LOVE CSS GRID! THIS IS AMAZING! LOOK MUM!*/
+	/*also just observe on how the css syntax highlighter breaks down on so much nested madness*/
+	grid-template-rows: repeat(auto-fit, [labl-start] auto [labl-end inpt-start] auto [inpt-end] );
+	column-gap: 0.5em;
+	row-gap: 0.75em;
+	margin-bottom: 2em;
+}

@@ -88,11 +88,11 @@ Allowed `fields` values:
 - `isconlang`: Whether the language is a constructed language. This is computed at language creation time and checks whether the language code ("id") is in a comprehensive ISO language code list fetched from <https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab>
 - `fonturl`: URL to a font file for the language on the server under the main resource path `/font`.
 
-#### `/word/LANG/list`: Words
+#### `/word/list`: Words
 
 This is one of the main APIs of the entire system. The word list API will return a list of words with their translations in a certain translation language. Essentially, this provides one half of a dictionary, with the other half obtained with source and target language swapped.
 
-The LANG part of the path is a placeholder for the source language ID. All words existent in the source language are included, whereas many words of the reference language never appear anywhere. The special query parameter `to` defines the language key of the target language, the language that translations are shown for. The name stems from the fact that in effect, the main language is translated into this target language (see also the from-to naming scheme in the client). If this query parameter is omitted, no translations are included in the result. This is recommended for simple word list retrievals, as including translations requires a much more involved database query with longer processing time. The translations are included in the result objects as an array named `translations`; this only contains the string names of each translating word. To obtain the full word information on one or more words, use the single word access API `/word/LANG/TEXT`
+The query parameter `from` represents the source language ID. All words existent in the source language are included, whereas many words of the reference language never appear anywhere. The special query parameter `to` defines the language key of the target language, the language that translations are shown for. The name stems from the fact that in effect, the main language is translated into this target language (see also the from-to naming scheme in the client). If this query parameter is omitted, no translations are included in the result. This is recommended for simple word list retrievals, as including translations requires a much more involved database query with longer processing time. The translations are included in the result objects as an array named `translations`; this only contains the string names of each translating word. To obtain the full word information on one or more words, use the single word access API `/word/LANG/TEXT`
 
 Allowed `fields` values:
 

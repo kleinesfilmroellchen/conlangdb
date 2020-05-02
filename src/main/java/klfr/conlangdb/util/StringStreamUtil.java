@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.SequenceInputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -57,6 +58,20 @@ public final class StringStreamUtil {
 	 */
 	public static String stringify(InputStream s, Charset charset) throws IOException {
 		final var r = new InputStreamReader(s, charset);
+		final var w = new StringWriter();
+		r.transferTo(w);
+		return w.toString();
+	}
+
+	
+	/**
+	 * Copies the readers contents to a string and assumes UTF-8 encoding.
+	 * 
+	 * @param r The reader to use.
+	 * @return a new string with the reader contents.
+	 * @throws IOException if the reader fucks up.
+	 */
+	public static String stringify(Reader r) throws IOException {
 		final var w = new StringWriter();
 		r.transferTo(w);
 		return w.toString();

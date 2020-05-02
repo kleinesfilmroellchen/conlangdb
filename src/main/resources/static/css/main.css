@@ -1,3 +1,4 @@
+/* Main styles: main.css */
 /* Settings and variables */
 *, *::before, *::after {
 	box-sizing: border-box;
@@ -17,7 +18,7 @@
 }
 
 /*All the dark theme does is redefine the foreground and background colors.*/
-@media (prefers-color-scheme: dark) {
+@media screen and (prefers-color-scheme: dark) {
 	:root {
 		--background: #272727;
 		--foreground: white;
@@ -30,8 +31,9 @@ body {
 	top: 0;
 	padding: 0;
 	margin: 0;
-	width: 100vw;
-	height: 100vh;
+	min-width: 100%;
+	max-width: 100%;
+	min-height: 100%;
 	font-family: 'Noto Sans', 'Segoe UI', 'Segoe UI Symbol', sans-serif;
 	background: var(--background);
 	color: var(--foreground);
@@ -70,39 +72,6 @@ hr {
 	display: grid;
 	min-height: 250px;
 }
-/*These 20 lines make the page responsive. LITERALLY. WAS IT THIS HARD, WORDPRESS?*/
-@media screen and (min-width: 700px) {
-	#page {
-		grid-template-areas: "main   help"
-							 "footer footer";
-		grid-template-columns: auto 30%;
-		grid-template-rows: auto 15mm;
-		column-gap: 1rem;
-		margin: 2.5cm 7mm 0;
-	}
-	main {
-		margin-bottom: 3em;
-	}
-	footer {
-		grid-template-columns: repeat(auto-fit, minmax(0, auto));
-		column-gap: 2em;
-		font-size: 80%;
-	}
-}
-@media screen and (max-width: 699px) {
-	#page {
-		grid-template-areas: "main"
-							 "help"
-							 "footer";
-		grid-template-columns: 1fr;
-		grid-template-rows: auto auto auto;
-		margin: 2.5cm 5% 0;
-	}
-	footer {
-		grid-template-rows: repeat(auto-fit, minmax(0, auto));
-		row-gap: 2em;
-	}
-}
 
 aside {
 	grid-area: help;
@@ -127,7 +96,7 @@ footer {
 }
 #help-toggle {
 	position: absolute;
-    bottom: 2000px;
+	top: -2000px;
 }
 #help-toggle-label:hover {
 	cursor: s-resize;
@@ -153,7 +122,7 @@ header .logo {
 .nav-toggle {
 	position: absolute;
 	height: 0;
-	top: -200px;
+	top: -2000px;
 }
 .nav-toggle-label {
 	position: absolute;
@@ -267,6 +236,7 @@ input#new-language-dialog-open:checked ~ div#new-language-dialog {
 	display: grid;
 }
 div#new-language-dialog {
+	margin-top: 1.5em;
 	grid-auto-rows: auto;
 	grid-template-columns: auto;
 	row-gap: 0.5em;
@@ -304,18 +274,6 @@ div#language-create-container > label {
 div#language-create-container > :not(label) {
 	grid-column: inpt;
 }
-@media screen and (max-width: 699px) {
-	div#language-create-container {
-		display: grid;
-		grid-template-columns: auto;
-		/*I LOVE CSS GRID! THIS IS AMAZING! LOOK MUM!*/
-		/*also just observe on how the css syntax highlighter breaks down on so much nested madness*/
-		grid-template-rows: repeat(auto-fit, [labl-start] auto [labl-end inpt-start] auto [inpt-end] );
-		column-gap: 0.5em;
-		row-gap: 0.75em;
-		margin-bottom: 2em;
-	}
-}
 
 input#language-id-edit {
 	width: 3em;
@@ -335,6 +293,48 @@ input[type="button"].language-select, input[type="button"].language-select:hover
 }
 input[type="button"].language-select::before {
 	display: none;
+}
+
+/* Word pages layout */
+
+div#dictionary-container {
+	display: grid;
+	grid-template-columns: [word-start] 1fr [word-end type-start] 1fr [type-end translations-start] minmax(8pc, 1fr) [translations-end definition-start] 1fr [definition-end];
+	grid-auto-rows: auto;
+	grid-auto-flow: row;
+}
+div#dictionary-container > * {
+	grid-column: 1;
+}
+div#dictionary-container > .dictionary-header {
+	font-weight: bold;
+}
+div#dictionary-container > .dictionary-content {
+	overflow: hidden;
+	overflow: clip;
+}
+div#dictionary-container > .word {
+	grid-column: word;
+}
+div#dictionary-container > .word-type {
+	grid-column: type;
+}
+div#dictionary-container > .translations {
+	grid-column: translations;
+}
+div#dictionary-container > .definition {
+	grid-column: definition;
+}
+
+div.page-navigation {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+}
+
+select#page-size-select {
+	margin-left: 1em;
 }
 
 /* Form styles */
@@ -363,6 +363,17 @@ textarea.borderless, input.borderless {
 	border: none;
 	background: none;
 	color: inherit;
+}
+
+select {
+	color: inherit;
+	background: none;
+	outline: none;
+	border-radius: 0;
+	border-color: var(--accent-3-dark);
+	border-style: solid;
+	transition: all 100ms linear;
+	font: inherit;
 }
 
 /* Buttons */
@@ -429,64 +440,4 @@ input[type=button].progress::after, button.progress::after {
 	animation-name: button-progress;
 	animation-duration: 1.5s;
 	animation-iteration-count: infinite;
-}
-
-
-/* Large Desktop styles */
-
-@media screen and (min-width: 1100px) {
-	.nav-toggle-label {
-		display: none;
-	}
-
-	header {
-		display: grid;
-		grid-template-columns: 1fr auto minmax(800px, 6fr) 1fr;
-	}
-
-	header .logo {
-		grid-column: 2 / 3;
-	}
-
-	nav {
-		all: unset;
-		grid-column: 3 / 4;
-		display: flex;
-		justify-content: flex-end;
-		align-items: center;
-		margin-top: 0;
-	}
-
-	nav ul {
-		display: flex;
-		justify-content: flex-end;
-	}
-	nav li {
-		opacity: 1;
-		margin-bottom: 0;
-		margin-left: 1.8rem;
-		align-self: baseline;
-	}
-
-	nav a {
-		opacity: 1;
-		position: relative;
-	}
-	/* fancy bar for links*/
-	nav a::before {
-		content: '';
-		display: block;
-		width: 4px;
-		background: var(--foreground);
-		position: absolute;
-		top: 0;
-		left: -1em;
-		bottom: 0;
-		transform: scale(1,0);
-		transform-origin: bottom;
-		transition: transform ease-in-out 250ms;
-	}
-	nav a:hover::before {
-		transform: scale(1,1);
-	}
 }

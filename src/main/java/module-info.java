@@ -5,10 +5,12 @@
  * Depends on the JSON library reference implementation.
  * Provides an API for extensions to use.
  */
-module klfr.conlangdb {
+open module klfr.conlangdb {
 	requires java.base;
 	requires java.sql;
-	requires java.net.http;
-	requires org.json;
-	requires takes;
+	requires transitive org.json;
+	requires transitive takes;
+	exports klfr.conlangdb;
+	exports klfr.conlangdb.util;
+	exports klfr.conlangdb.http.util;
 }

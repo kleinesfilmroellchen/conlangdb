@@ -1,5 +1,8 @@
 package klfr.conlangdb.database;
 
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
@@ -13,6 +16,8 @@ import java.util.logging.Logger;
 
 import klfr.conlangdb.CObject;
 import klfr.conlangdb.ServerMain.Arguments;
+import klfr.conlangdb.database.commands.CreateServerFunctionsCmd;
+import klfr.conlangdb.database.commands.InitDatabaseCmd;
 
 /**
  * Static class used to communicate with the database managing thread. This
@@ -23,7 +28,8 @@ public class DatabaseCommunicator extends CObject {
 	protected static final Logger log = Logger.getLogger(DatabaseCommunicator.class.getCanonicalName());
 
 	/**
-	 * Maximum number of times the communicator will try to submit any command to the queue.
+	 * Maximum number of times the communicator will try to submit any command to
+	 * the queue.
 	 */
 	public static final int MAX_COMMAND_RETRIES = 10;
 
@@ -62,8 +68,8 @@ public class DatabaseCommunicator extends CObject {
 
 		// initialize the database
 		try {
-			queue.put(new DatabaseCommand.CreateServerFunctionsCmd());
-			queue.put(new DatabaseCommand.InitDatabaseCmd());
+			queue.put(new CreateServerFunctionsCmd());
+			queue.put(new InitDatabaseCmd());
 		} catch (InterruptedException e) {
 			log.log(Level.SEVERE, "Interrupted while initializing database", e);
 			dbmanagerT.interrupt();
@@ -87,7 +93,8 @@ public class DatabaseCommunicator extends CObject {
 	 * re-submitted
 	 */
 	@SuppressWarnings("unchecked")
-	private static synchronized <T extends Object> Future<Optional<T>> submitCommand(DatabaseCommand<T> cmd, int retryCount) {
+	private static synchronized <T extends Object> Future<Optional<T>> submitCommand(DatabaseCommand<T> cmd,
+			int retryCount) {
 		try {
 			queue.put((DatabaseCommand<Object>) cmd);
 		} catch (InterruptedException e) {
@@ -102,6 +109,32 @@ public class DatabaseCommunicator extends CObject {
 			submitCommand(cmd, retryCount + 1);
 		}
 		return cmd;
+	}
+
+	/**
+	 * Typechecker that converts known non-mapped sql types like Arrays to
+	 * compatible Java types. For Arrays, in particular, a collection type is
+	 * returned which JSONObject can handle as an array. Nulls are mapped to
+	 * Nothing, anything else is mapped to Just with some value. If anything bad
+	 * happens, Nothing is returned.
+	 * 
+	 * @param sqlType
+	 * @return
+	 */
+	public static Optional<Object> javaType(Object sqlType) {
+		try {
+			var res = Just(sqlType);
+			// only typecheck on non-null stuff
+			if (res.isPresent()) {
+				if (sqlType instanceof java.sql.Array) {
+					// TODO: may break on primitive data types, depends on db driver
+					res = Just(Arrays.asList((Object[])((java.sql.Array) sqlType).getArray()));
+				}
+			}
+			return res;
+		} catch (SQLException e) {
+			return Nothing();
+		}
 	}
 
 }

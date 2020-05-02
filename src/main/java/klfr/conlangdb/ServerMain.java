@@ -84,7 +84,7 @@ public class ServerMain extends CObject {
 	 */
 	public void start() {
 		try {
-			log.info("Server Main method entered. ÄÄÖÖÜÜ");
+			log.info("Server Main method entered. Unicode test: ÄÖÜßЛこれ");
 			log.config(() -> arguments.toString());
 
 			//// Setup the Takes server architecture
@@ -110,8 +110,7 @@ public class ServerMain extends CObject {
 							new FkTypes("application/json",
 									new TkListAPI(TkListAPI.languageQueryBuilder, List.of("id", "name"), "id")))),
 					// Single language page/api
-					new FkRegex(
-							TkLanguageAPI.languageAPIPattern,
+					new FkRegex(TkLanguageAPI.languageAPIPattern,
 							new TkFork(
 									new FkMethods("GET",
 											new TkFork(
@@ -122,16 +121,21 @@ public class ServerMain extends CObject {
 									new FkMethods("POST", new TkLanguageAPI.Post()),
 									new FkMethods("DELETE", new TkLanguageAPI.Delete()))),
 					// Word list page/api (WIP)
-					new FkRegex(Pattern.quote("/word/list"), new TkFork(
-							new FkTypes("text/html", new TkStaticPageWrap(new TkDictionaryPage(), "dictionary")),
-							new FkTypes("application/json",
-									new TkListAPI(TkListAPI.dictionaryQueryBuilder, List.of("text"), "text")))),
+					new FkRegex(Pattern.quote("/word/list"),
+							new TkFork(
+									new FkTypes("text/html",
+											new TkStaticPageWrap(new TkDictionaryPage(), new TkDictionaryPage.Headers(),
+													"dictionary")),
+									new FkTypes("application/json",
+											new TkListAPI(TkListAPI.wordQueryBuilder, List.of("text", "translations"), "romanized")))),
+					// single word page/api (WIP)
 					new FkRegex("/word/(\\S{1,3})/(.+)",
 							new TkFork(
 									new FkMethods("GET",
 											new TkFork(
 													new FkTypes("text/html",
-															new TkStaticPageWrap(new TkSingleWordPage(), "word")),
+															new TkStaticPageWrap(new TkSingleWordPage(),
+																	new TkSingleWordPage.Headers(), "word")),
 													new FkTypes("application/json", new TkSingleWordAPI.Get()))),
 									new FkMethods("POST", new TkSingleWordAPI.Post()),
 									new FkMethods("DELETE", new TkSingleWordAPI.Delete()))),

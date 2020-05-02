@@ -64,7 +64,7 @@ public class TkFilesAdvanced extends CObject implements Take {
 		mimeTypes.put("jpg", "image/jpeg");
 		mimeTypes.put("jpe", "image/jpeg");
 		mimeTypes.put("png", "image/png");
-		mimeTypes.put("ico", "image/x-icon");
+		mimeTypes.put("ico", "image/png");
 		mimeTypes.put("svg", "image/svg+xml");
 		mimeTypes.put("tiff", "image/tiff");
 		mimeTypes.put("tif", "image/tiff");

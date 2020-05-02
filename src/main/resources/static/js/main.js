@@ -1,11 +1,10 @@
 // main.js: Master JavaScript
 
 // minimized simple mutex implementation
-class Mutex { constructor() { this.b = !1, this.q = [] } synchronize(t) { const s = this; return new Promise(function (n, h) { s.q.push([t, n, h]), s.b || s.d() }) } d() { this.b = !0; const t = this.q.shift(); t ? this.e(t) : this.b = !1 } e(t) { const [s, n, h] = t, i = this; s().then(n, h).then(function () { i.d() }) } }
+class Mutex { constructor() { this.b = !1, this.q = [] } synchronize(t) { const s = this; return new Promise(function (n, h) { s.q.push([t, n, h]), s.b || s.d() }) } d() { this.b = !0; const t = this.q.shift(); t ? this.e(t) : this.b = !1 } e(t) { const [s, n, h] = t, i = this; s().then(n, h).then(function () { i.d() }) } };
 
 
 const pagename = document.querySelector('meta[name="pageid"]').content;
-console.log(pagename);
 
 const translationPromise = getPageTranslation();
 
@@ -64,10 +63,10 @@ window.addEventListener('DOMContentLoaded', () => {
 		} else {
 			const langselectContent = document.querySelector("#language-selection-template").content.cloneNode(true);
 			langselectLi.appendChild(langselectContent);
-			langselectLi.querySelector("a#language-from").href = `/language/${languageFrom}`;
-			langselectLi.querySelector("a#language-to").href = `/language/${languageTo}`;
-			getLanguageName(languageFrom).then(langname => langselectLi.querySelector("#language-from").innerHTML = langname);
-			getLanguageName(languageTo).then(langname => langselectLi.querySelector("#language-to").innerHTML = langname);
+			langselectLi.querySelector("a.language-from-name").href = `/language/${languageFrom}`;
+			langselectLi.querySelector("a.language-to-name").href = `/language/${languageTo}`;
+			getLanguageName(languageFrom).then(langname => document.querySelectorAll(".language-from-name").forEach(elt => elt.innerHTML = langname));
+			getLanguageName(languageTo).then(langname => document.querySelectorAll(".language-to-name").forEach(elt => elt.innerHTML = langname));
 		}
 
 		// Help text
@@ -108,7 +107,7 @@ function requestStatistics() {
 		for (const countkey of ["language", "word", "definition", "wordattribute"].map(x => `${x}-count`)) {
 			container.querySelectorAll(`#${countkey}`).forEach(elt => elt.innerHTML = statistics[`${countkey}`].all);
 			container.querySelectorAll(`#${countkey}-lang1`).forEach(elt => elt.innerHTML = statistics[`${countkey}`][window.localStorage.languageFrom]);
-			container.querySelectorAll(`#${countkey}-lang2`).forEach(elt => elt.innerHTML = statistics[`${countkey}`][window.localStorage.languageFrom]);
+			container.querySelectorAll(`#${countkey}-lang2`).forEach(elt => elt.innerHTML = statistics[`${countkey}`][window.localStorage.languageTo]);
 		}
 		container.querySelectorAll("#conlang-count").forEach(elt => elt.innerHTML = statistics["language-count"].constructed);
 

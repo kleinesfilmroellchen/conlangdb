@@ -1,0 +1,5 @@
+/* Animationless styles: no-animation.css */
+* {
+	transition: none !important;
+	animation: none !important;
+}

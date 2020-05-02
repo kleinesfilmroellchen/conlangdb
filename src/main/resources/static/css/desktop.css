@@ -1,0 +1,17 @@
+/* Medium-sized styles: desktop.css */
+#page {
+	grid-template-areas: "main   help"
+						 "footer footer";
+	grid-template-columns: auto minmax(30%, 3pc);
+	grid-template-rows: auto 15mm;
+	column-gap: 1rem;
+	margin: 2.5cm 7mm 0;
+}
+main {
+	margin-bottom: 3em;
+}
+footer {
+	grid-template-columns: repeat(auto-fit, minmax(0, auto));
+	column-gap: 2em;
+	font-size: 80%;
+}

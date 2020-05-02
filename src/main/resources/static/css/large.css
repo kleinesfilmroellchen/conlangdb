@@ -1,0 +1,55 @@
+/* Large over-HD desktop styles: large.css */
+.nav-toggle-label {
+	display: none;
+}
+
+header {
+	display: grid;
+	grid-template-columns: 1fr auto minmax(800px, 6fr) 1fr;
+}
+
+header .logo {
+	grid-column: 2 / 3;
+}
+
+nav {
+	all: unset;
+	grid-column: 3 / 4;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	margin-top: 0;
+}
+
+nav ul {
+	display: flex;
+	justify-content: flex-end;
+}
+nav li {
+	opacity: 1;
+	margin-bottom: 0;
+	margin-left: 1.8rem;
+	align-self: baseline;
+}
+
+nav a {
+	opacity: 1;
+	position: relative;
+}
+/* fancy bar for links*/
+nav a::before {
+	content: '';
+	display: block;
+	width: 4px;
+	background: var(--foreground);
+	position: absolute;
+	top: 0;
+	left: -1em;
+	bottom: 0;
+	transform: scale(1,0);
+	transform-origin: bottom;
+	transition: transform ease-in-out 250ms;
+}
+nav a:hover::before {
+	transform: scale(1,1);
+}

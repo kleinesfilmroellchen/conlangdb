@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,6 +15,7 @@ import org.json.JSONObject;
  */
 public final class CResources extends CObject {
 	private static final long serialVersionUID = 1L;
+	private static final Logger log = Logger.getLogger(CResources.class.getCanonicalName());
 	/**
 	 * Name of the top-level folder that contains all resources, relative to the
 	 * module-info.class.

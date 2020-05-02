@@ -1,0 +1,34 @@
+<!-- Dictionary (word list with translation relations from source language to target language) -->
+<main>
+	<div class="page-navigation">
+		<button class="prevpage">&LeftTriangle;</button>
+		<div><label for="page-size-select" class="t--select-page-size"></label><select id="page-size-select">
+				<option value="30" class="t--small"></option>
+				<option value="70" class="t--large"></option>
+				<option value="0" class="t--single-page"></option>
+			</select></div>
+		<button class="nextpage">&RightTriangle;</button>
+	</div>
+	<h1><span class="t--translating-from"></span>&nbsp;<span class="language-from-name"></span>&nbsp;<span
+			class="t--to"></span>&nbsp;<span class="language-to-name"></span></h1>
+	<div id="dictionary-container">
+		<!-- css grid -->
+		<!-- Template for each row -->
+		<template id="dictionary-row">
+			<a href="" class="dictionary-content word" id=""></a>
+			<span class="dictionary-content word-type"></span>
+			<span class="dictionary-content translations"></span>
+			<span class="dictionary-content definition"></span>
+		</template>
+		<!-- headers -->
+		<span class="dictionary-header word t--word-name"></span>
+		<span class="dictionary-header word-type t--word-type"></span>
+		<span class="dictionary-header translations t--translations"></span>
+		<span class="dictionary-header definition t--definition"></span>
+	</div>
+	<div class="page-navigation">
+		<button class="prevpage">&LeftTriangle;</button>
+		<button class="nextpage">&RightTriangle;</button>
+	</div>
+</main>
+<!-- End of dictionary.html -->
