@@ -1,5 +1,29 @@
 <!-- Single word view page, from word-view.html -->
 <main>
-	
+	<div class="word-data-container" id="word-view-container">
+		<h2 class="word-native" class="native-script-font"></h2>
+		<p class="word-attributes"></p>
+		<p class="word-romanized"></p>
+		<ul id="translations-list">
+			<template id="translation-item-template">
+				<li class="translation-item">
+					<span class="translation"></span> <span class="translation-explanation"></span>
+				</li>
+			</template>
+		</ul>
+		<h4 class="t--definitions"></h4>
+		<ol id="definitions-list">
+			<template id="definition-item-template">
+				<li class="definition-item"></li>
+			</template>
+		</ol>
+	</div>
+	<div class="word-data-container hidden" id="word-edit-container">
+		<input type="text" class="word-native native-script-font borderless">
+
+	</div>
+	<button type="button" class="t--button-edit language-edit" id="button-edit"></button>
+	<button type="button" class="t--button-save hidden language-edit" id="button-save"></button>
+	<button type="button" class="t--button-delete language-edit" id="button-delete"></button>
 </main>
 <!-- End of word-view.html -->

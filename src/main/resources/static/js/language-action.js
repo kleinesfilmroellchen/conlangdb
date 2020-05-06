@@ -84,7 +84,7 @@ async function executeLanguageModification(mode) {
 	return newLocation;
 }
 /**
- * Navigates to 
+ * Navigates to the new location path given, but only if it differs from the current path.
  */
 Window.prototype.navigateOnChange = function navigateOnChange(newLocation) {
 	if (newLocation && (this.location.pathname != newLocation)) {

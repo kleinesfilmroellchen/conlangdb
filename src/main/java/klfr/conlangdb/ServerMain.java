@@ -20,6 +20,7 @@ import org.takes.http.FtBasic;
 import org.takes.rs.RsHtml;
 
 import klfr.conlangdb.http.TkDictionaryPage;
+import klfr.conlangdb.http.TkFontProvider;
 import klfr.conlangdb.http.TkLanguageAPI;
 import klfr.conlangdb.http.TkLanguageListPage;
 import klfr.conlangdb.http.TkLanguagePage;
@@ -127,9 +128,10 @@ public class ServerMain extends CObject {
 											new TkStaticPageWrap(new TkDictionaryPage(), new TkDictionaryPage.Headers(),
 													"dictionary")),
 									new FkTypes("application/json",
-											new TkListAPI(TkListAPI.wordQueryBuilder, List.of("text", "translations"), "romanized")))),
+											new TkListAPI(TkListAPI.wordQueryBuilder, List.of("text", "translations"),
+													"romanized")))),
 					// single word page/api (WIP)
-					new FkRegex("/word/(\\S{1,3})/(.+)",
+					new FkRegex(TkSingleWordAPI.singleWordAPIPtn,
 							new TkFork(
 									new FkMethods("GET",
 											new TkFork(
@@ -142,6 +144,7 @@ public class ServerMain extends CObject {
 					//// API
 					// Translation JSON maps
 					new FkRegex("\\/translation\\/([a-z]{2,3})(?:\\_([A-Z]{2,3}))?", new TkTranslations()),
+					new FkRegex(TkFontProvider.requestPath, new TkFontProvider()),
 					// Statistics
 					new FkRegex(Pattern.quote("/statistics"), new TkStatistics())),
 					//// Fallback for handling server errors and error codes

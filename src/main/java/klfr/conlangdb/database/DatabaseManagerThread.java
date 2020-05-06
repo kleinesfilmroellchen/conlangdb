@@ -95,7 +95,8 @@ class DatabaseManagerThread extends Thread {
 				while (true) {
 					// blocks while queue is empty
 					nextCommand = commandQueue.take();
-					log.fine(f("RUN COMMAND %s", String.valueOf(nextCommand)));
+					final var nc = nextCommand;
+					log.fine(() -> f("RUN COMMAND %s", nc));
 					databaseConnection.beginRequest();
 					final var executable = nextCommand.getTask(databaseConnection);
 					executable.run();

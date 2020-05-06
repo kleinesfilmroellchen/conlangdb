@@ -20,6 +20,11 @@ public class NoArgumentCmd<T> extends DatabaseCommand<T> {
 				return toExecute.execute(con);
 			} catch (SQLException e) {
 				log.log(Level.SEVERE, "SQL exception in NoArgumentCommand", e);
+				try {
+					con.rollback();
+				} catch (SQLException e1) {
+					// do nothing
+				}
 				return Nothing();
 			}
 		});

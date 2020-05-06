@@ -24,9 +24,7 @@ Many conlangs will not use any existing script and, therefore, mostly use charac
 
 ## Static files
 
-The files under the paths `/js`, `/img` and `/css` serve static JavaScript, Image and CSS files respectively, which can be found directly in the server's static resources folder (`/res/static/...`). One special case is the `/favicon.ico`, which is equivalent to `/img/favicon.png`. This shorthand is provided because most modern browsers automatically fetch the favicon from the standard path. The MIME type is hard-coded to `text/javascript`, `image/png` and `text/css`, respectively. This may change for the image subfolder.
-
-The files under the path `/font` serve static font files, mostly in OTF format.
+The files under the paths `/js`, `/img` and `/css` serve static JavaScript, Image and CSS files respectively, which can be found directly in the server's static resources folder (`/res/static/...`). One special case is the `/favicon.ico`, which is equivalent to `/img/favicon.png`. This shorthand is provided because most modern browsers automatically fetch the favicon from the standard path. The files under the path `/font` serve static font files.
 
 ## "Static" HTML pages
 
@@ -64,6 +62,10 @@ The `xx_XX` portion of the translation path specifies language and optionally re
 - If no translation is found for the language, the `en.json` file is used, which is equivalent to the endpoint `/translation/en`.
 
 If a certain region or language (or a combination thereof) is not found, the server treats that locale to have no translations whatsoever. The above scheme allows, for example, for the translation of only a couple of region-specific terms, whereas the general language translation file will handle most of the translations. Also, invalid or unsupported locales will in the worst case result in the English translation being returned.
+
+### `/conscript/LANG`: Conscript provider for different languages
+
+This path enables the use of custom font files with the ConlangDB system. This API is provided with the language ID "LANG" and returns a small CSS file defining an `@font-face` rule for the font family `"NATIVE-SCRIPT-FONT"`. Additionally, a class selector for `.native-script-font` is included which makes all elements with this class use the conscript. The url for the font face is generated from the `FontUrl` property of the language, which may point to a font file name without extension. The user can provide different formats for this conscript and all of them are included as alternatives in the source list of the CSS. Also, in the future, it may be possible to provide bold and italic font faces which may be referenced by the CSS using some standard naming conventions. For now, the CSS allows bold and italic font synthesis.
 
 ### `/XXX/list` with `Accept: application/json`: Lists for various data
 
@@ -103,20 +105,62 @@ Allowed `fields` values:
 
 This API allows for retrieving (GET), manipulating or creating (POST) and deleting (DELETE) single languages. The language is identified with the ID "LANG". 404 is used for all nonexistent languages that are attempted to be GET'd or DELETE'd.
 
-## GET with `Accept: application/json`
+#### GET with `Accept: application/json`
 
 Retrieves all data for a single language as a JSON object. (key list to be inserted here)
 
-## POST
+#### POST
 
 Change or create a language's data. The request body is a JSON object that indicates all the language data to be changed. The keys are identical with the ones returned by GET. The only special key that can be used is the "id" key, which will change the language's ID to the new given ID.
 
-The answer by the server is a 200 for a language change and 201 (Created) for language creation. The answer body contains all the language information as with a GET request. The Location header is set to the language's path, which may be equal to the path that the POST request was made on (and will always be for newly created languages). It will be changed if through an "id" key in the request body, the language's ID was changed and it is therefore now available on a new, different path. The client can therefore simply GET the Location URL.
+The answer by the server is a 204 for a language change and 201 (Created) for language creation. The Location header is set to the language's path, which may be equal to the path that the POST request was made on (and will always be for newly created languages). It will be changed if through an `id` key in the request body, the language's ID was changed and it is therefore now available on a new, different path. The client can therefore simply GET the Location URL.
 
-## DELETE
+#### DELETE
 
 Delete a language. The answer is 200 and the answer body contains all the language information as with a GET request
 
 ### `/word/LANG/TEXT`: Single word access
 
-This API allows for retrieving (GET), manipulating or creating (POST) and deleting (DELETE) single words.
+This API allows for retrieving (GET), manipulating or creating (POST) and deleting (DELETE) single words. LANG is the language id and TEXT is the romanized form of the word. (The database restrictions ensure that any language ID - romanized text - combination is unique)
+
+#### GET with `Accept: application/json`
+
+Retrieves all data for a single word as a JSON object. The form of the object is as follows:
+
+- `text`: Native text of the word, may contain complicated or non-printable Unicode characters. This key is absent if for the word no native text is defined.
+- `romanized`: Romanized form of the word's text, will always have a value.
+- `translations`: An array of simplified translation word objects. The keys are `text` for the native text, `romanized` and `description` for the translation description. For this purpose, the `translate` query parameter can specify the translation language that should be used for looking up the translation data. May be empty if either no translations exist or no translation language was given.
+- `definitions`: An array of definition strings. May be empty.
+- `attributes`: An array of attribute objects. These have the same form as the attribute objects of the attribute endpoints. May be empty.
+
+#### POST
+
+Modifies base word data, cannot, however, modify translation, definition or attribute data. The specific APIs used for this purpose are listed below.
+
+Except for the array keys, all other data sent with the GET can be modified by sending a JSON object with the exact same form. Non-specified data is not modified. The result will usually be `204`. If the specified word does not exist, it is created. The romanized form of the word and the language code are taken from the request path and all other required parameters need to be specified. In this case, the answer will be `201`. The Location header will contain the path to the word, which may be different from the request path if the romanized form of the word was changed. `400` errors most commonly occur on database constraint violations, such as changing the word's text or romanized form to something that is already defined for this language.
+
+The language ID may be modified with the key `language`. This is uncommon, but possible, and the Location header reflects the new language. Note that changing the language ID will very likely change the meaning that translation relations to other words have, with some translations becoming synonyms and vice-versa. (This is because only the APIs treat translations and synonyms differently, but to the database, they are the same thing.)
+
+#### DELETE
+
+Deletes a word. The answer is `204` if successful.
+
+#### `/word/LANG/TEXT/ACTION`: Word modification sub-APIs
+
+These APIs modify certain parts of a word. The ACTION is one of the paths listed below. Note that these APIs cannot be GET, and trying to do so will result in `405` (Method Unallowed).
+
+##### `definition`: Add and remove definitions for this word
+
+A POST on this path will create a new definition, with the definition text being the **exact Request body**. This is different from most JSON-based APIs, but possible here because definitions only have their text data. A definition can be deleted by DELETE-ing and supplying the **entire definition text in the Request body**. Successful deletes will return `204`.
+
+##### `translation/LANG2/WORD2`: Add and remove translation data
+
+This endpoint can also be POST-ed and DELETE-d. Both requests need to be done to a subpath of the form `LANG2/WORD2`; in total, the request path will be something like `/word/LANG/TEXT/translation/LANG2/WORD2`. This path will add or delete translations to the word WORD2 (romanized form, as in WORD itself) in the language LANG2.
+
+While POST-ing: If the word does not exist in the other language yet, it will be created in the process, but without setting its native text. If the translation does already exist, it remains untouched. Specifying a body will set the translation description of the translation **to the entire Request body**, if the body is empty, no modification to the translation description is done. As above, this diverges from usual JSON format, but is perfectly fine for this linear endpoint. The status code informs about what action was actually executed: `304` indicates that the translation was already present and no modification of the translation description was attempted. `204` indicates that the translation was created, and the other word already existed, so no new word data was created. `201` indicates that the other word was newly created and can itself be found under the path specified by the Location header.
+
+While DELETE-ing: Note that the other word is never deleted, but only the translation association is removed. The normal status is `204` for successfully deleted translations.
+
+##### `attribute/ATTR`: Add and remove attribute data
+
+The ATTR part of the path is the symbol of the attribute that should be added (POST) or DELETE-d. Note that attribute symbols are unique for a given language. The status is `204` when adding or removing the attribute was successful and `304` if on POST the attribute already existed for the given word. Note that this API does not create attributes, this needs to be done beforehand with the attribute APIs.

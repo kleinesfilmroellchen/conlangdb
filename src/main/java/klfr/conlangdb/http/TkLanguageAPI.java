@@ -125,7 +125,8 @@ public final class TkLanguageAPI extends CObject {
 						final var existenceChecker = con.prepareStatement("select id from tlanguage where id=?;");
 						existenceChecker.setString(1, modifiedLanguage);
 						final var exists = existenceChecker.executeQuery();
-						// if there was a record found, the first next() call will return true and point to the language's id
+						// if there was a record found, the first next() call will return true and point
+						// to the language's id
 						if (exists.next()) {
 							log.fine(() -> "DATABASE modifying language %s".formatted(modifiedLanguage));
 							// the language exists, do UPDATE (which may change the language id)
@@ -141,10 +142,10 @@ public final class TkLanguageAPI extends CObject {
 							// set all existent keys, use counter to keep track of parameter index
 							var counter = 1;
 							for (final var key : List.of("id", "name", "name-en", "description", "description-en",
-									"fonturl", "config")) {
+									"fonturl", "config"))
 								if (rq.has(key))
 									updator.setString(counter++, rq.getString(key));
-							}
+
 							log.finer("Parameter counter %s, query '%s'".formatted(counter, updator.toString()));
 							// the where clause's language parameter is the last argument
 							updator.setString(counter, modifiedLanguage);

@@ -165,6 +165,7 @@ public final class StringStreamUtil {
 		});
 	}
 
+	// TODO: could the heap be actually be polluted or is the compiler just not able to prove otherwise?
 	public static <T> Iterable<T> sequencify(final Iterable<T>... iterables) {
 		return new Iterable<T>() {
 			@Override

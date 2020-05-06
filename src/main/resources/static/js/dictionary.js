@@ -26,7 +26,7 @@ window.addEventListener('DOMContentLoaded', async evt => {
 	});
 
 	const langFrom = window.localStorage.languageFrom, langTo = window.localStorage.languageTo;
-	const words = await fetch(`/word/list?from=${langFrom}&to=${langTo}${window.localStorage.ipp ? `&page=${page}&ipp=${window.localStorage.ipp}` : ''}&fields=romanized,types,definitions`,
+	const words = await fetch(`/word/list?from=${langFrom}&to=${langTo}${window.localStorage.ipp ? `&page=${page}&ipp=${window.localStorage.ipp}` : ''}&fields=text,romanized,types,definitions`,
 		{ headers: { 'Accept': 'application/json' } })
 		.then(res => res.ok ? res.json() : Promise.reject(res.status))
 		.catch(ecode => {
@@ -39,7 +39,7 @@ window.addEventListener('DOMContentLoaded', async evt => {
 	const table = document.querySelector('#dictionary-container');
 	for ({ text = '', romanized, translations, definitions, types } of words) {
 		const row = rowtemplate.cloneNode(true);
-		row.querySelector('.word').innerHTML = `${text} (${romanized})`;
+		row.querySelector('.word').innerHTML = `<span class="native-script-font">${text}</span> (${romanized})`;
 		row.querySelector('.word').id = romanized;
 		row.querySelector('a.word').href = `/word/${langFrom}/${romanized}`;
 		row.querySelector('.word-type').innerHTML = types.join(' ');

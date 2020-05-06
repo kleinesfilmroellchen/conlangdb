@@ -84,7 +84,7 @@ public class ServerEntry extends CObject {
 			}
 		});
 		LogManager.getLogManager().reset();
-		Logger.getLogger("").setLevel(Level.ALL);
+		Logger.getLogger("").setLevel(Level.FINER);
 		for (var h : Logger.getLogger("").getHandlers())
 			Logger.getLogger("").removeHandler(h);
 		Logger.getLogger("").addHandler(ch);

@@ -1,0 +1,18 @@
+/* native-font.css: Native font stylesheet with placeholder for native script font url. */
+
+@font-face {
+	src: url("/fonts/%%JAVA-FONT-FILE%%.woff2") format("woff2"),
+		url("/fonts/%%JAVA-FONT-FILE%%.woff") format("woff"),
+		url("/fonts/%%JAVA-FONT-FILE%%.ttf") format("truetype"),
+		url("/fonts/%%JAVA-FONT-FILE%%.otf") format("opentype");
+	font-family: "NATIVE-SCRIPT-FONT";
+	font-style: normal;
+	font-weight: normal;
+	/*enable every contextual, ligature and kerning feature. Add further enablers if your font isn't displayed properly.*/
+	font-feature-settings: "calt" on, "ccmp" on, "clig" on, "kern" on, "liga" on;
+	font-synthesis: weight style;
+}
+
+.native-script-font {
+	font-family: "NATIVE-SCRIPT-FONT" !important;
+}

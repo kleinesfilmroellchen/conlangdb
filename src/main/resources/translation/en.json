@@ -63,6 +63,7 @@
 
 	"t--word-type": "Word type",
 	"t--definition": "Definition",
+	"t--definitions": "Definitions",
 	"t--translating-from": "Translating from",
 	"t--translations": "Translations",
 	"t--select-page-size": "Page size:",

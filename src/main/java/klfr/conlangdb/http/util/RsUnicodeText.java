@@ -20,6 +20,14 @@ import klfr.conlangdb.util.StringStreamUtil;
 public class RsUnicodeText implements Response {
 	private final String body;
 
+	/**
+	 * Creates a response that only contains the specified body string, which will
+	 * be encoded into UTF-8. The Content-Type header of the response must be set by
+	 * the user of this class to ensure that the client knows about the content
+	 * encoding.
+	 * 
+	 * @param body The body to send, any string-like object.
+	 */
 	public RsUnicodeText(CharSequence body) {
 		this.body = body.toString();
 	}
