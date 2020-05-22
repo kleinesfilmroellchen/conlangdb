@@ -1,3 +1,7 @@
+**THIS PROJECT IS CANCELLED. Nothing about this is finished; however, I am going to leave it up here for anyone that is interested.**
+
+(As for the reason why: I discovered Campfire Pro, an application that does essentially everything I wanted ConlangDB to do and more. For me, it is acceptable to pay 90€ once instead of spending some additional months finishing and refining this own project.)
+
 # ConlangDB
 
 The ConlangDB project is a Web application running on Java and an SQL Database for managing constructed language word and translation data.
